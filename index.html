@@ -455,7 +455,7 @@ document.getElementById('formIuran').addEventListener('submit', function(e) {
             const formData = {
                 nama: document.getElementsByName('nama')[0].value,
                 blok: document.getElementsByName('blok')[0].value,
-                bulan: document.getElementById('bulanWarga').value + " " + document.getElementById('tahunWarga').value,
+                bulan: "'" + document.getElementById('bulanWarga').value + " " + document.getElementById('tahunWarga').value,
                 jumlah: document.getElementById('jumlahInput').value.replace(/[^0-9]/g, ''),
                 buktiTf: ev.target.result // Gambar dalam Base64
             };
