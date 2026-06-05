@@ -521,11 +521,12 @@ async function muatTabelKelola() {
     
     try {
         const keywordCari = document.getElementById('kataKunciKelola').value;
-const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet, keyword: keywordCari });
+        const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet, keyword: keywordCari });
         document.getElementById('loadingKelola').style.display = "none";
         if(data.length === 0) { document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center'>Tidak ada data</td></tr>"; return; }
         
-        let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"] : ["Tgl Input", "Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
+        // PERUBAHAN DISINI: Kolom "Tgl Input" dihapus dari pengeluaran dan pemasukan lain
+        let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"] : ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
         let trHead = "<tr>"; headers.forEach(h => trHead += `<th>${h}</th>`); trHead += "</tr>"; document.getElementById('headKelola').innerHTML = trHead;
         
         let tbody = document.getElementById('bodyKelola');
@@ -556,13 +557,18 @@ async function hapusDataAdmin(rowId) {
 function bukaFormEdit(rowData, rowId) {
     const sheet = document.getElementById('pilihSheetKelola').value;
     document.getElementById('formEditKelola').classList.remove('hidden'); document.getElementById('editRowId').innerText = rowId; document.getElementById('editSheetName').value = sheet;
-    let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status"] : ["Tgl Input", "Tanggal", "Kategori", "Nominal", "Keterangan"];
+    
+    // PERUBAHAN DISINI: Kolom "Tgl Input" dihapus dari form edit pengeluaran dan pemasukan lain
+    let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status"] : ["Tanggal", "Kategori", "Nominal", "Keterangan"];
     let formHtml = "";
+    
     rowData.forEach((val, index) => {
-        let readOnly = index === 0 ? "readonly" : "";
+        // PERUBAHAN DISINI: Yang dikunci (readonly) hanya khusus "Tgl Input". "Tanggal Transaksi" tidak dikunci.
+        let readOnly = (headers[index] === "Tgl Input") ? "readonly" : "";
         let helpText = (headers[index] === "Nominal") ? `<small class="text-muted d-block" style="font-size:10px;">Hanya angka, hilangkan titik (.)</small>` : "";
         formHtml += `<div class="col-sm-6 mb-2"><label class="form-label small fw-bold mb-1">${headers[index]}</label><input type="text" class="form-control form-control-sm edit-input-val" value="${val}" ${readOnly}>${helpText}</div>`;
     });
+    
     document.getElementById('editInputs').innerHTML = formHtml; document.getElementById('formEditKelola').scrollIntoView({behavior: "smooth"});
 }
 
