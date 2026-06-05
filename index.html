@@ -225,14 +225,23 @@
 
         <div id="subKelola" class="hidden">
             <h5 class="mb-3 text-danger text-center fw-bold">Manajemen Edit & Hapus Data</h5>
-            <div class="mb-3">
-                <label class="form-label text-muted">Pilih Kategori Data:</label>
-                <select class="form-select" id="pilihSheetKelola" onchange="muatTabelKelola()">
-                    <option value="Data_Pemasukan_Lain">Kas Masuk (Non-Iuran)</option>
-                    <option value="Data_Pengeluaran">Kas Keluar (Pengeluaran)</option>
-                    <option value="Data_Pembayaran">Data Iuran Warga</option>
-                </select>
-            </div>
+            <div class="row g-2 mb-3">
+    <div class="col-sm-6">
+        <label class="form-label text-muted">Pilih Kategori Data:</label>
+        <select class="form-select" id="pilihSheetKelola" onchange="muatTabelKelola()">
+            <option value="Data_Pembayaran">Data Iuran Warga</option>
+            <option value="Data_Pemasukan_Lain">Kas Masuk (Non-Iuran)</option>
+            <option value="Data_Pengeluaran">Kas Keluar (Pengeluaran)</option>
+        </select>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label text-muted">Cari Data (Nama/Blok/Bulan):</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="kataKunciKelola" placeholder="Ketik kata kunci...">
+            <button class="btn btn-primary" onclick="muatTabelKelola()">🔍 Cari</button>
+        </div>
+    </div>
+</div>
             <div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data spreadsheet...</div>
             <div id="formEditKelola" class="card-custom mt-3 hidden" style="border: 2px solid #ef4444; background: #fef2f2;">
                 <h6 class="text-danger fw-bold border-bottom pb-2">Edit Data (Baris Spreadsheet: <span id="editRowId"></span>)</h6>
@@ -511,7 +520,8 @@ async function muatTabelKelola() {
     document.getElementById('loadingKelola').style.display = "block"; document.getElementById('bodyKelola').innerHTML = ""; document.getElementById('headKelola').innerHTML = ""; document.getElementById('formEditKelola').classList.add('hidden');
     
     try {
-        const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet });
+        const keywordCari = document.getElementById('kataKunciKelola').value;
+const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet, keyword: keywordCari });
         document.getElementById('loadingKelola').style.display = "none";
         if(data.length === 0) { document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center'>Tidak ada data</td></tr>"; return; }
         
