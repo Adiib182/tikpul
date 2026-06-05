@@ -575,7 +575,25 @@ function bukaFormEdit(rowData, rowId) {
 async function simpanHasilEdit(btn) {
     btn.disabled = true; btn.innerText = "Menyimpan...";
     const sheet = document.getElementById('editSheetName').value, rowId = document.getElementById('editRowId').innerText;
-    let dataBaru = []; document.querySelectorAll('.edit-input-val').forEach(inp => dataBaru.push(inp.value));
+    
+    // =========================================================
+    // LOGIKA BARU: MENAMBAHKAN TANDA KUTIP PADA KOLOM BULAN
+    // =========================================================
+    let dataBaru = []; 
+    document.querySelectorAll('.edit-input-val').forEach((inp, index) => {
+        let nilai = inp.value;
+        
+        // Jika sedang mengedit 'Data_Pembayaran' dan posisi index adalah 3 (Kolom Bulan)
+        if (sheet === "Data_Pembayaran" && index === 3) {
+            // Jika di depannya belum ada tanda kutip tunggal, kita tambahkan
+            if (nilai && !nilai.startsWith("'")) {
+                nilai = "'" + nilai;
+            }
+        }
+        dataBaru.push(nilai);
+    });
+    // =========================================================
+
     try {
         const res = await apiPost('simpanEditData', { namaSheet: sheet, rowId: rowId, dataBaru: dataBaru });
         alert(res.pesan);
