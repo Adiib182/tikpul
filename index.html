@@ -84,7 +84,7 @@
 
 <div class="app-header">
     <div class="logo-container">🏡📈</div>
-    <h3>Sistem Kas & Iuran Warga</h3>
+    <h3>Sistem Kas & IPL Warga</h3>
     <p>Cluster Titik Pulang Sawangan</p>
 </div>
 
@@ -99,13 +99,13 @@
         <h5 class="fw-bold mb-3 text-dark text-center">Grafik Keuangan Lingkungan</h5>
         <div class="row g-2 mb-3">
             <div class="col-6">
-                <label class="form-label text-muted">Saring Tahun</label>
+                <label class="form-label text-muted">Pilih Tahun</label>
                 <select class="form-select form-select-sm" id="filterTahun" onchange="muatDashboard()">
                     <option value="Semua">-- Semua Tahun --</option>
                 </select>
             </div>
             <div class="col-6">
-                <label class="form-label text-muted">Saring Bulan</label>
+                <label class="form-label text-muted">Pilih Bulan</label>
                 <select class="form-select form-select-sm" id="filterBulan" onchange="muatDashboard()">
                     <option value="Semua" selected>-- Semua Bulan --</option>
                     <option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
@@ -121,7 +121,7 @@
                 <div class="col-6"><div class="finance-card bg-masuk"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Masuk</span><h5 class="text-success m-0 fw-bold" id="totalDashboard">Rp 0</h5></div></div>
                 <div class="col-6"><div class="finance-card bg-keluar"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Keluar</span><h5 class="text-danger m-0 fw-bold" id="totalPengeluaranDashboard">Rp 0</h5></div></div>
             </div>
-            <div class="finance-card bg-saldo"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Sisa Saldo Kas Bersih</span><h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3></div>
+            <div class="finance-card bg-saldo"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Sisa Saldo</span><h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3></div>
         </div>
 
         <div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
@@ -147,8 +147,8 @@
         <div id="subWargaBayar">
             <h5 class="text-center fw-bold mb-3 text-dark">Kirim Konfirmasi Pembayaran</h5>
             <form id="formIuran">
-                <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" name="nama" required></div>
-                <div class="mb-3"><label class="form-label">No. Rumah / Blok</label><input type="text" class="form-control" name="blok" placeholder="Contoh: A-05" required></div>
+                <div class="mb-3"><label class="form-label">Nama</label><input type="text" class="form-control" name="nama" required></div>
+                <div class="mb-3"><label class="form-label">No. Rumah / Blok</label><input type="text" class="form-control" name="blok" placeholder="Contoh: A15" required></div>
                 <div class="row g-2 mb-3">
                     <div class="col-7">
                         <label class="form-label">Iuran Bulan</label>
@@ -172,7 +172,7 @@
         <div id="subWargaCek" class="hidden">
             <h5 class="text-center fw-bold mb-3 text-dark">Cek Status Iuran Rumah</h5>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" id="blokCekMandiri" placeholder="Masukkan Nomor Rumah (Cth: A-05)">
+                <input type="text" class="form-control" id="blokCekMandiri" placeholder="Masukkan Nomor Rumah (Cth: A15)">
                 <button class="btn btn-primary fw-bold" type="button" id="btnProsesCek" onclick="prosesCekMandiriWarga()">Cari Data</button>
             </div>
             <div id="loadingCekWarga" class="text-center text-muted my-3" style="display:none;">Mencari data...</div>
@@ -242,7 +242,7 @@
         </div>
     </div>
 </div>
-            <div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data spreadsheet...</div>
+            <div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data...</div>
             <div id="formEditKelola" class="card-custom mt-3 hidden" style="border: 2px solid #ef4444; background: #fef2f2;">
                 <h6 class="text-danger fw-bold border-bottom pb-2">Edit Data (Baris Spreadsheet: <span id="editRowId"></span>)</h6>
                 <input type="hidden" id="editSheetName">
