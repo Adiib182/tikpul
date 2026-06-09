@@ -616,18 +616,17 @@ async function simpanHasilEdit(btn) {
 async function aksiWarga(mode) {
     const blok = document.getElementById('inputBlok').value;
     if (!blok) { alert("Masukkan nama blok!"); return; }
-
+    
     if (mode === 'hapus' && !confirm("Yakin ingin menghapus blok " + blok + "?")) return;
 
     try {
-        // Menggunakan fungsi apiPost yang sudah ada di sistem Anda
-        // Ini otomatis akan mengurus URL dan pengiriman JSON
+        // CUKUP GUNAKAN INI:
+        // apiPost sudah otomatis menangani URL dan format pengiriman JSON
         const res = await apiPost('kelolaMasterWarga', { mode: mode, blok: blok });
-
+        
         if (res.sukses) {
             alert(res.pesan);
-            document.getElementById('inputBlok').value = ''; 
-            // Jika ingin tabel otomatis refresh, panggil fungsi muat tabel Anda di sini
+            document.getElementById('inputBlok').value = ''; // Reset input
         } else {
             alert("Gagal: " + res.pesan);
         }
