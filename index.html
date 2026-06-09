@@ -189,9 +189,8 @@
         <div class="d-flex justify-content-center gap-1 mb-4 flex-wrap">
             <button class="btn btn-sm btn-outline-primary active fw-bold" id="btnSubVerifikasi" onclick="bukaSubAdmin('verifikasi')">Verifikasi Masuk</button>
             <button class="btn btn-sm btn-outline-primary fw-bold" id="btnSubTunggakan" onclick="bukaSubAdmin('tunggakan')">Rekap Akumulasi</button>
-            <button class="btn btn-sm btn-outline-dark fw-bold" id="btnSubPengeluaran" onclick="bukaSubAdmin('pengeluaran')">🔄 Buku Kas Umum</button>            
+            <button class="btn btn-sm btn-outline-dark fw-bold" id="btnSubPengeluaran" onclick="bukaSubAdmin('pengeluaran')">🔄 Buku Kas Umum</button>
             <button class="btn btn-sm btn-outline-danger fw-bold" id="btnSubKelola" onclick="bukaSubAdmin('kelola')">⚙️ Kelola Data</button>
-            <button class="btn btn-sm btn-outline-success fw-bold mt-1" id="btnSubTambahWarga" onclick="bukaSubAdmin('tambahwarga')">🏠 Tambah Warga</button>
         </div>
 
         <div id="subVerifikasi"><div id="loadingAdmin" class="text-center text-muted">Mengambil data pending...</div><div id="daftarPending"></div></div>
@@ -235,18 +234,6 @@
             <option value="Data_Pengeluaran">Kas Keluar (Pengeluaran)</option>
         </select>
     </div>
-<div id="subTambahWarga" class="hidden card-custom" style="border: 1px solid #10b981;">
-    <h5 class="mb-3 text-success text-center fw-bold">Tambah Data Master Warga</h5>
-    <form id="formTambahWarga" onsubmit="event.preventDefault(); simpanWargaBaru();">
-        <div class="mb-3">
-            <label class="form-label">Blok / Nomor Rumah Baru</label>
-            <input type="text" class="form-control" id="inputBlokBaru" placeholder="Contoh: A15 atau B-20" required>
-            <small class="text-muted">Pastikan nomor blok belum pernah didaftarkan sebelumnya.</small>
-        </div>
-        <button type="submit" id="btnSubmitWarga" class="btn btn-success btn-upgrade w-100">Simpan Warga Baru</button>
-    </form>
-    <div id="pesanTambahWarga" class="alert mt-3" style="display:none;"></div>
-</div>
     <div class="col-sm-6">
         <label class="form-label text-muted">Cari Data (Nama/Blok/Bulan):</label>
         <div class="input-group">
@@ -519,20 +506,13 @@ async function muatRekapAkumulasi() {
 }
 
 function bukaSubAdmin(sub) {
-    ['subVerifikasi', 'subTunggakan', 'subPengeluaran', 'subKelola', 'subTambahWarga'].forEach(id => document.getElementById(id).classList.add('hidden'));
-    ['btnSubVerifikasi', 'btnSubTunggakan', 'btnSubPengeluaran', 'btnSubKelola', 'btnSubTambahWarga'].forEach(id => document.getElementById(id).classList.remove('active'));
+    ['subVerifikasi', 'subTunggakan', 'subPengeluaran', 'subKelola'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    ['btnSubVerifikasi', 'btnSubTunggakan', 'btnSubPengeluaran', 'btnSubKelola'].forEach(id => document.getElementById(id).classList.remove('active'));
 
     if (sub === 'verifikasi') { document.getElementById('subVerifikasi').classList.remove('hidden'); document.getElementById('btnSubVerifikasi').classList.add('active'); muatDataAdmin(); }
     else if (sub === 'tunggakan') { document.getElementById('subTunggakan').classList.remove('hidden'); document.getElementById('btnSubTunggakan').classList.add('active'); muatRekapAkumulasi(); }
     else if (sub === 'pengeluaran') { document.getElementById('subPengeluaran').classList.remove('hidden'); document.getElementById('btnSubPengeluaran').classList.add('active'); document.getElementById('tglKeluar').valueAsDate = new Date(); }
     else if (sub === 'kelola') { document.getElementById('subKelola').classList.remove('hidden'); document.getElementById('btnSubKelola').classList.add('active'); muatTabelKelola(); }
-}
-    else if (sub === 'tambahwarga') { 
-        document.getElementById('subTambahWarga').classList.remove('hidden'); 
-        document.getElementById('btnSubTambahWarga').classList.add('active'); 
-        document.getElementById('inputBlokBaru').value = "";
-        document.getElementById('pesanTambahWarga').style.display = "none";
-    }
 }
 
 async function muatTabelKelola() {
@@ -620,33 +600,6 @@ async function simpanHasilEdit(btn) {
         if(res.sukses) { document.getElementById('formEditKelola').classList.add('hidden'); muatTabelKelola(); if (document.getElementById('filterTahun')) muatDashboard(); }
     } catch(e) { alert("Gagal menyimpan perubahan."); }
     btn.disabled = false; btn.innerText = "💾 Simpan Perubahan";
-}
-async function simpanWargaBaru() {
-    const btn = document.getElementById('btnSubmitWarga');
-    const pesanBox = document.getElementById('pesanTambahWarga');
-    const blokInput = document.getElementById('inputBlokBaru').value;
-    
-    btn.disabled = true;
-    btn.innerText = "Menyimpan...";
-    
-    try {
-        const res = await apiPost('tambahWargaBaru', { blok: blokInput });
-        pesanBox.innerText = res.pesan;
-        pesanBox.style.display = "block";
-        pesanBox.className = res.sukses ? "alert alert-success mt-3" : "alert alert-danger mt-3";
-        
-        if (res.sukses) {
-            document.getElementById('inputBlokBaru').value = ""; // Kosongkan form jika sukses
-        }
-    } catch(e) {
-        pesanBox.innerText = "Terjadi kesalahan sistem saat menyimpan data.";
-        pesanBox.className = "alert alert-danger mt-3";
-        pesanBox.style.display = "block";
-    }
-    
-    btn.disabled = false;
-    btn.innerText = "Simpan Warga Baru";
-    setTimeout(() => { pesanBox.style.display = "none"; }, 4000); // Pesan hilang otomatis setelah 4 detik
 }
 </script>
 </body>
