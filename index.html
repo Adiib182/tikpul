@@ -612,27 +612,35 @@ async function simpanHasilEdit(btn) {
     } catch(e) { alert("Gagal menyimpan perubahan."); }
     btn.disabled = false; btn.innerText = "💾 Simpan Perubahan";
 }
+    
 async function aksiWarga(mode) {
     const blok = document.getElementById('inputBlok').value;
-    if (!blok) { alert("Masukkan nama blok terlebih dahulu!"); return; }
+    if (!blok) { alert("Masukkan nama blok!"); return; }
     
-    if (mode === 'hapus' && !confirm("Yakin ingin menghapus blok " + blok + "?")) return;
-
-    // Menampilkan status loading (opsional)
-    alert("Memproses " + mode + " blok " + blok + "...");
+    // Perhatikan bagian 'data: { mode: mode, blok: blok }'
+    // Ini yang akan ditangkap oleh 'request.data' di doPost
+    const payload = {
+        action: "kelolaMasterWarga",
+        data: {
+            mode: mode,
+            blok: blok
+        }
+    };
 
     try {
-        // Mengirim request ke GAS menggunakan fungsi apiPost yang sudah ada di sistem Anda
-        const res = await apiPost('kelolaMasterWarga', { mode: mode, blok: blok });
+        const response = await fetch(URL_DEPLOYMENT_ANDA, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const res = await response.json();
         
         if (res.sukses) {
             alert(res.pesan);
-            document.getElementById('inputBlok').value = ''; // Reset input
         } else {
-            alert("Gagal: " + res.pesan);
+            alert("Error: " + res.pesan);
         }
     } catch (e) {
-        alert("Terjadi kesalahan koneksi.");
+        alert("Gagal koneksi ke server.");
     }
 }
 </script>
