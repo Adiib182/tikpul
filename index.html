@@ -616,31 +616,23 @@ async function simpanHasilEdit(btn) {
 async function aksiWarga(mode) {
     const blok = document.getElementById('inputBlok').value;
     if (!blok) { alert("Masukkan nama blok!"); return; }
-    
-    // Perhatikan bagian 'data: { mode: mode, blok: blok }'
-    // Ini yang akan ditangkap oleh 'request.data' di doPost
-    const payload = {
-        action: "kelolaMasterWarga",
-        data: {
-            mode: mode,
-            blok: blok
-        }
-    };
+
+    if (mode === 'hapus' && !confirm("Yakin ingin menghapus blok " + blok + "?")) return;
 
     try {
-        const response = await fetch(URL_DEPLOYMENT_ANDA, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        const res = await response.json();
-        
+        // Menggunakan fungsi apiPost yang sudah ada di sistem Anda
+        // Ini otomatis akan mengurus URL dan pengiriman JSON
+        const res = await apiPost('kelolaMasterWarga', { mode: mode, blok: blok });
+
         if (res.sukses) {
             alert(res.pesan);
+            document.getElementById('inputBlok').value = ''; 
+            // Jika ingin tabel otomatis refresh, panggil fungsi muat tabel Anda di sini
         } else {
-            alert("Error: " + res.pesan);
+            alert("Gagal: " + res.pesan);
         }
     } catch (e) {
-        alert("Gagal koneksi ke server.");
+        alert("Terjadi kesalahan koneksi ke server.");
     }
 }
 </script>
