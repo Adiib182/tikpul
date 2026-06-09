@@ -225,6 +225,17 @@
 
         <div id="subKelola" class="hidden">
             <h5 class="mb-3 text-danger text-center fw-bold">Manajemen Edit & Hapus Data</h5>
+            <div class="card mb-4 border-primary">
+               <div class="card-body">
+                    <h6 class="fw-bold">Tambah/Hapus Master Warga</h6>
+                    <div class="input-group mb-2">
+                         <input type="text" id="inputBlok" class="form-control" placeholder="Contoh: A10">
+                         <button class="btn btn-success" onclick="aksiWarga('tambah')">Tambah</button>
+                         <button class="btn btn-danger" onclick="aksiWarga('hapus')">Hapus</button>
+                     </div>
+                     <small class="text-muted">*Masukkan kode blok lalu klik Aksi.</small>
+                 </div>
+             </div>
             <div class="row g-2 mb-3">
     <div class="col-sm-6">
         <label class="form-label text-muted">Pilih Kategori Data:</label>
@@ -600,6 +611,29 @@ async function simpanHasilEdit(btn) {
         if(res.sukses) { document.getElementById('formEditKelola').classList.add('hidden'); muatTabelKelola(); if (document.getElementById('filterTahun')) muatDashboard(); }
     } catch(e) { alert("Gagal menyimpan perubahan."); }
     btn.disabled = false; btn.innerText = "💾 Simpan Perubahan";
+}
+async function aksiWarga(mode) {
+    const blok = document.getElementById('inputBlok').value;
+    if (!blok) { alert("Masukkan nama blok terlebih dahulu!"); return; }
+    
+    if (mode === 'hapus' && !confirm("Yakin ingin menghapus blok " + blok + "?")) return;
+
+    // Menampilkan status loading (opsional)
+    alert("Memproses " + mode + " blok " + blok + "...");
+
+    try {
+        // Mengirim request ke GAS menggunakan fungsi apiPost yang sudah ada di sistem Anda
+        const res = await apiPost('kelolaMasterWarga', { mode: mode, blok: blok });
+        
+        if (res.sukses) {
+            alert(res.pesan);
+            document.getElementById('inputBlok').value = ''; // Reset input
+        } else {
+            alert("Gagal: " + res.pesan);
+        }
+    } catch (e) {
+        alert("Terjadi kesalahan koneksi.");
+    }
 }
 </script>
 </body>
