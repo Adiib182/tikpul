@@ -224,6 +224,18 @@
         </div>
 
         <div id="subKelola" class="hidden">
+            <!-- Form Tambah Warga Baru -->
+<div class="card p-3 mb-4 bg-light border-primary">
+    <h6 class="fw-bold text-primary mb-2">➕ Tambah Warga Baru (Master)</h6>
+    <div class="row g-2">
+        <div class="col-8">
+            <input type="text" class="form-control" id="inputBlokBaru" placeholder="Contoh: A16">
+        </div>
+        <div class="col-4">
+            <button class="btn btn-primary w-100 fw-bold" onclick="tambahDataWarga()">Simpan</button>
+        </div>
+    </div>
+</div>
             <h5 class="mb-3 text-danger text-center fw-bold">Manajemen Edit & Hapus Data</h5>
             <div class="card mb-4 border-primary">
                <div class="card-body">
@@ -613,26 +625,11 @@ async function simpanHasilEdit(btn) {
     btn.disabled = false; btn.innerText = "💾 Simpan Perubahan";
 }
     
-async function aksiWarga(mode) {
-    const blok = document.getElementById('inputBlok').value;
-    if (!blok) { alert("Masukkan nama blok!"); return; }
-    
-    if (mode === 'hapus' && !confirm("Yakin ingin menghapus blok " + blok + "?")) return;
-
-    try {
-        // CUKUP GUNAKAN INI:
-        // apiPost sudah otomatis menangani URL dan format pengiriman JSON
-        const res = await apiPost('kelolaMasterWarga', { mode: mode, blok: blok });
-        
-        if (res.sukses) {
-            alert(res.pesan);
-            document.getElementById('inputBlok').value = ''; // Reset input
-        } else {
-            alert("Gagal: " + res.pesan);
-        }
-    } catch (e) {
-        alert("Terjadi kesalahan koneksi ke server.");
-    }
+async function tambahDataWarga() {
+    const blok = document.getElementById('inputBlokBaru').value;
+    const res = await apiPost('tambahWarga', { blokBaru: blok });
+    alert(res.pesan);
+    if(res.sukses) muatDataWargaUntukAdmin(); // Fungsi untuk refresh tabel warga
 }
 </script>
 </body>
