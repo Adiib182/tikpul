@@ -539,9 +539,15 @@ async function muatTabelKelola() {
         if(data.length === 0) { document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center'>Tidak ada data</td></tr>"; return; }
         
         // PERUBAHAN DISINI: Kolom "Tgl Input" dihapus dari pengeluaran dan pemasukan lain
-        let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"] : ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
-        let trHead = "<tr>"; headers.forEach(h => trHead += `<th>${h}</th>`); trHead += "</tr>"; document.getElementById('headKelola').innerHTML = trHead;
-        
+let headers;
+if (sheet === "Data_Pembayaran") {
+    headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"];
+} else if (sheet === "Master_Warga") {
+    // Sesuaikan item di dalam array ini jika sheet Master_Warga Anda memiliki kolom lain (misal: "Nama", "No HP", dll)
+    headers = ["Blok", "Aksi"]; 
+} else {
+    headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
+}        
         let tbody = document.getElementById('bodyKelola');
         data.forEach(row => {
             let rowId = row[row.length - 1]; let rowData = row.slice(0, row.length - 1);
@@ -572,7 +578,15 @@ function bukaFormEdit(rowData, rowId) {
     document.getElementById('formEditKelola').classList.remove('hidden'); document.getElementById('editRowId').innerText = rowId; document.getElementById('editSheetName').value = sheet;
     
     // PERUBAHAN DISINI: Kolom "Tgl Input" dihapus dari form edit pengeluaran dan pemasukan lain
-    let headers = sheet === "Data_Pembayaran" ? ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status"] : ["Tanggal", "Kategori", "Nominal", "Keterangan"];
+    let headers;
+if (sheet === "Data_Pembayaran") {
+    headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status"];
+} else if (sheet === "Master_Warga") {
+    // Pastikan array di sini sama dengan yang ada di muatTabelKelola, HANYA SAJA TANPA kolom "Aksi"
+    headers = ["Blok"]; 
+} else {
+    headers = ["Tanggal", "Kategori", "Nominal", "Keterangan"];
+}
     let formHtml = "";
     
     rowData.forEach((val, index) => {
