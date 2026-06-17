@@ -492,7 +492,7 @@ async function muatDataAdmin() {
         document.getElementById('loadingAdmin').style.display = "none"; const container = document.getElementById('daftarPending');
         if (data.length === 0) { container.innerHTML = "<div class='alert alert-success text-center'>Semua lunas!</div>"; return; }
         data.forEach(item => {
-            container.insertAdjacentHTML('beforeend', `<div class="card-konfirmasi"><h6>${item.nama} (${item.blok})</h6><p class="mb-1 small"><strong>Bulan:</strong> ${item.bulan} | <strong>Jumlah:</strong> Rp ${Number(item.jumlah).toLocaleString('id-ID')}</p><div class="mt-2"><a href="${item.buktiUrl}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 me-1">Buka Foto</a><button onclick="verifikasi(${item.rowId}, this)" class="btn btn-sm btn-success py-0 px-2">Setuju</button></div></div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="card-konfirmasi"><h6>${item.nama} (${item.blok})</h6><p class="mb-1 small"><strong>Bulan:</strong> ${item.bulan} | <strong>Jumlah:</strong> Rp ${Number(item.jumlah).toLocaleString('id-ID')}</p><div class="mt-2"><a href="${item.buktiUrl}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 me-1">Buka Foto</a><button onclick="verifikasi(${item.rowId}, this)" class="btn btn-sm btn-success py-0 px-2 me-1">Setuju</button><button onclick="tolak(${item.rowId}, this)" class="btn btn-sm btn-danger py-0 px-2">Tolak</button></div></div>`);
         });
     } catch(e) { console.error(e); }
 }
@@ -505,6 +505,19 @@ async function verifikasi(rowId, btn) {
     } catch(e) { alert("Gagal verifikasi."); btn.disabled = false; }
 }
 
+async function tolak(rowId, btn) {
+    if(!confirm("⚠️ Yakin ingin menolak konfirmasi pembayaran ini?")) return;
+    
+    btn.disabled = true;
+    try {
+        await apiPost('tolakPembayaran', { rowId: rowId });
+        muatDataAdmin(); // Refresh daftar pending otomatis
+    } catch(e) { 
+        alert("Gagal menolak konfirmasi."); 
+        btn.disabled = false; 
+    }
+}
+    
 async function muatRekapAkumulasi() {
     document.getElementById('loadingTunggakan').style.display = "block"; document.getElementById('tabelTunggakan').style.display = "none"; document.getElementById('tunggakanKosong').style.display = "none"; document.getElementById('bodyTunggakan').innerHTML = "";
     try {
