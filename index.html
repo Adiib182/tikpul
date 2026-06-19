@@ -128,13 +128,16 @@
 
         <div class="border-top pt-3 mt-3">
             <h6 class="fw-bold text-success mb-2 d-flex align-items-center">🟢 Rincian Uang Masuk yang Diterima</h6>
-            <div class="tabel-scroll mb-3">
+            <div class="tabel-scroll mb-1">
                 <table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Sumber</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianMasuk"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
             </div>
+            <div id="paginasiMasuk" class="d-flex justify-content-end gap-1 mb-3"></div>
+         
             <h6 class="fw-bold text-danger mb-2 d-flex align-items-center">🔴 Rincian Uang Keluar / Pengeluaran</h6>
-            <div class="tabel-scroll">
+            <div class="tabel-scroll mb-1">
                 <table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Kategori</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianKeluar"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
             </div>
+            <div id="paginasiKeluar" class="d-flex justify-content-end gap-1 mb-2"></div>
         </div>
     </div>
 
@@ -268,6 +271,7 @@
             <div class="tabel-scroll mt-3" style="max-height: 350px;">
                 <table class="table table-sm table-bordered table-striped align-middle small mb-0 bg-white" id="tabelKelola"><thead class="table-dark sticky-top" id="headKelola"></thead><tbody id="bodyKelola"></tbody></table>
             </div>
+            <div id="paginasiKelola" class="d-flex justify-content-end gap-1 mt-2 mb-2"></div>
         </div>
     </div>
 </div>
@@ -306,6 +310,32 @@ async function apiPost(action, payload = {}) {
 // ==============================================================
 let sudahLogin = false;
 let chartInstance = null;
+
+// === VARIABEL GLOBAL PAGINATION ===
+const LIMIT_PER_PAGE = 20;
+let dataMasukGlobal = [], dataKeluarGlobal = [], dataKelolaGlobal = [];
+let pageMasuk = 1, pageKeluar = 1, pageKelola = 1;
+
+function renderPaginasi(containerId, totalData, currentPage, callbackName) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+    const totalPages = Math.ceil(totalData / LIMIT_PER_PAGE);
+    if (totalPages <= 1) return;
+
+    let html = `<button class="btn btn-sm btn-outline-primary fw-bold py-0" onclick="${callbackName}(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>`;
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, currentPage + 1);
+    if (currentPage === 1) end = Math.min(totalPages, 3);
+    if (currentPage === totalPages) start = Math.max(1, totalPages - 2);
+
+    for (let i = start; i <= end; i++) {
+        html += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'} fw-bold py-0" onclick="${callbackName}(${i})">${i}</button>`;
+    }
+
+    html += `<button class="btn btn-sm btn-outline-primary fw-bold py-0" onclick="${callbackName}(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+    container.innerHTML = html;
+}
 
 window.onload = function() {
     bikinOpsiTahunOtomatis();
@@ -369,10 +399,8 @@ async function muatDashboard() {
     const bulan = document.getElementById('filterBulan').value;
     document.getElementById('tabelRincianMasuk').innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr>';
     document.getElementById('tabelRincianKeluar').innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr>';
-
     try {
         const data = await apiGet('ambilDataDashboard', { tahun: tahun, bulan: bulan });
-        
         document.getElementById('totalDashboard').innerText = "Rp " + data.totalDisaring.toLocaleString('id-ID');
         document.getElementById('totalPengeluaranDashboard').innerText = "Rp " + data.totalPengeluaran.toLocaleString('id-ID');
         
@@ -388,17 +416,52 @@ async function muatDashboard() {
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
 
-        const tbodyMasuk = document.getElementById('tabelRincianMasuk'); tbodyMasuk.innerHTML = "";
-        if(data.rincianMasuk.length === 0) tbodyMasuk.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi masuk</td></tr>';
-        else data.rincianMasuk.forEach(i => tbodyMasuk.insertAdjacentHTML('beforeend', `<tr><td>${i.tanggal}</td><td><span class="badge badge-masuk-tag">${i.kategori}</span></td><td class="fw-bold text-success">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="text-muted text-wrap">${i.keterangan}</td></tr>`));
-
-        const tbodyKeluar = document.getElementById('tabelRincianKeluar'); tbodyKeluar.innerHTML = "";
-        if(data.rincianKeluar.length === 0) tbodyKeluar.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi keluar</td></tr>';
-        else data.rincianKeluar.forEach(i => tbodyKeluar.insertAdjacentHTML('beforeend', `<tr><td>${i.tanggal}</td><td><span class="badge badge-keluar-tag">${i.kategori}</span></td><td class="fw-bold text-danger">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="text-muted text-wrap">${i.keterangan}</td></tr>`));
+        dataMasukGlobal = data.rincianMasuk;
+        dataKeluarGlobal = data.rincianKeluar;
+        pageMasuk = 1;
+        pageKeluar = 1;
+        
+        tampilkanTabelMasuk();
+        tampilkanTabelKeluar();
 
     } catch (e) {
         console.error("Error Dashboard:", e);
     }
+}
+
+function ubahHalamanMasuk(page) { pageMasuk = page; tampilkanTabelMasuk(); }
+function ubahHalamanKeluar(page) { pageKeluar = page; tampilkanTabelKeluar(); }
+
+function tampilkanTabelMasuk() {
+    const tbody = document.getElementById('tabelRincianMasuk');
+    tbody.innerHTML = "";
+    if(dataMasukGlobal.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi masuk</td></tr>';
+        document.getElementById('paginasiMasuk').innerHTML = '';
+        return;
+    }
+    const start = (pageMasuk - 1) * LIMIT_PER_PAGE;
+    const end = start + LIMIT_PER_PAGE;
+    const dataTampil = dataMasukGlobal.slice(start, end);
+
+    dataTampil.forEach(i => tbody.insertAdjacentHTML('beforeend', `<tr><td>${i.tanggal}</td><td><span class="badge badge-masuk-tag">${i.kategori}</span></td><td class="fw-bold text-success">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="text-muted text-wrap">${i.keterangan}</td></tr>`));
+    renderPaginasi('paginasiMasuk', dataMasukGlobal.length, pageMasuk, 'ubahHalamanMasuk');
+}
+
+function tampilkanTabelKeluar() {
+    const tbody = document.getElementById('tabelRincianKeluar');
+    tbody.innerHTML = "";
+    if(dataKeluarGlobal.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi keluar</td></tr>';
+        document.getElementById('paginasiKeluar').innerHTML = '';
+        return;
+    }
+    const start = (pageKeluar - 1) * LIMIT_PER_PAGE;
+    const end = start + LIMIT_PER_PAGE;
+    const dataTampil = dataKeluarGlobal.slice(start, end);
+
+    dataTampil.forEach(i => tbody.insertAdjacentHTML('beforeend', `<tr><td>${i.tanggal}</td><td><span class="badge badge-keluar-tag">${i.kategori}</span></td><td class="fw-bold text-danger">Rp ${i.nominal.toLocaleString('id-ID')}</td><td class="text-muted text-wrap">${i.keterangan}</td></tr>`));
+    renderPaginasi('paginasiKeluar', dataKeluarGlobal.length, pageKeluar, 'ubahHalamanKeluar');
 }
 
 document.getElementById('formPengeluaran').addEventListener('submit', async function(e) {
@@ -543,40 +606,63 @@ function bukaSubAdmin(sub) {
 
 async function muatTabelKelola() {
     const sheet = document.getElementById('pilihSheetKelola').value;
-    document.getElementById('loadingKelola').style.display = "block"; document.getElementById('bodyKelola').innerHTML = ""; document.getElementById('headKelola').innerHTML = ""; document.getElementById('formEditKelola').classList.add('hidden');
+    document.getElementById('loadingKelola').style.display = "block"; 
+    document.getElementById('bodyKelola').innerHTML = ""; 
+    document.getElementById('headKelola').innerHTML = "";
+    document.getElementById('formEditKelola').classList.add('hidden');
     
     try {
         const keywordCari = document.getElementById('kataKunciKelola').value;
         const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet, keyword: keywordCari });
         document.getElementById('loadingKelola').style.display = "none";
-        if(data.length === 0) { document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center'>Tidak ada data</td></tr>"; return; }
         
-        // PERUBAHAN DISINI: Kolom "Tgl Input" dihapus dari pengeluaran dan pemasukan lain
-let headers;
-if (sheet === "Data_Pembayaran") {
-    headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"];
-} else if (sheet === "Master_Warga") {
-    // Sesuaikan item di dalam array ini jika sheet Master_Warga Anda memiliki kolom lain (misal: "Nama", "No HP", dll)
-    headers = ["Blok", "Aksi"]; 
-} else {
-    headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
-}        
-        let tbody = document.getElementById('bodyKelola');
-        data.forEach(row => {
-            let rowId = row[row.length - 1]; let rowData = row.slice(0, row.length - 1);
-            let tdHTML = "";
-            rowData.forEach(val => {
-                let text = val.toString();
-                if(text.length > 25 && !text.includes('http')) text = text.substring(0, 25) + '...';
-                if(text.includes('http')) text = `<a href="${text}" target="_blank">Lihat</a>`;
-                tdHTML += `<td>${text}</td>`;
-            });
-            tdHTML += `<td class="text-nowrap"><button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick='bukaFormEdit(${JSON.stringify(rowData)}, ${rowId})'>✏️</button><button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button></td>`;
-            tbody.insertAdjacentHTML('beforeend', `<tr>${tdHTML}</tr>`);
-        });
+        let headers;
+        if (sheet === "Data_Pembayaran") headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"];
+        else if (sheet === "Master_Warga") headers = ["Blok", "Aksi"];
+        else headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
+        
+        let headHtml = "<tr>";
+        headers.forEach(h => headHtml += `<th>${h}</th>`);
+        headHtml += "</tr>";
+        document.getElementById('headKelola').innerHTML = headHtml;
+
+        dataKelolaGlobal = data;
+        pageKelola = 1;
+        tampilkanTabelKelola();
+
     } catch(e) { console.error(e); }
 }
 
+function ubahHalamanKelola(page) { pageKelola = page; tampilkanTabelKelola(); }
+
+function tampilkanTabelKelola() {
+    let tbody = document.getElementById('bodyKelola');
+    tbody.innerHTML = "";
+    if(dataKelolaGlobal.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='10' class='text-center py-3'>Tidak ada data</td></tr>";
+        document.getElementById('paginasiKelola').innerHTML = '';
+        return;
+    }
+    
+    const start = (pageKelola - 1) * LIMIT_PER_PAGE;
+    const end = start + LIMIT_PER_PAGE;
+    const dataTampil = dataKelolaGlobal.slice(start, end);
+
+    dataTampil.forEach(row => {
+        let rowId = row[row.length - 1]; let rowData = row.slice(0, row.length - 1);
+        let tdHTML = "";
+        rowData.forEach(val => {
+            let text = val.toString();
+            if(text.length > 25 && !text.includes('http')) text = text.substring(0, 25) + '...';
+            if(text.includes('http')) text = `<a href="${text}" target="_blank">Lihat</a>`;
+            tdHTML += `<td>${text}</td>`;
+        });
+        tdHTML += `<td class="text-nowrap"><button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick='bukaFormEdit(${JSON.stringify(rowData)}, ${rowId})'>✏️</button><button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button></td>`;
+        tbody.insertAdjacentHTML('beforeend', `<tr>${tdHTML}</tr>`);
+    });
+    
+    renderPaginasi('paginasiKelola', dataKelolaGlobal.length, pageKelola, 'ubahHalamanKelola');
+}
 async function hapusDataAdmin(rowId) {
     if(!confirm("⚠️ Yakin ingin menghapus data di baris ke-" + rowId + " ini?")) return;
     const sheet = document.getElementById('pilihSheetKelola').value;
