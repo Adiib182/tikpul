@@ -118,10 +118,17 @@
 
         <div class="finance-summary-box">
             <div class="row g-2">
-                <div class="col-6"><div class="finance-card bg-masuk"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Masuk</span><h5 class="text-success m-0 fw-bold" id="totalDashboard">Rp 0</h5></div></div>
-                <div class="col-6"><div class="finance-card bg-keluar"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Keluar</span><h5 class="text-danger m-0 fw-bold" id="totalPengeluaranDashboard">Rp 0</h5></div></div>
+                <div class="col-6"><div class="finance-card bg-masuk"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Masuk (Bulan Ini)</span><h5 class="text-success m-0 fw-bold" id="totalDashboard">Rp 0</h5></div></div>
+                <div class="col-6"><div class="finance-card bg-keluar"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Keluar (Bulan Ini)</span><h5 class="text-danger m-0 fw-bold" id="totalPengeluaranDashboard">Rp 0</h5></div></div>
             </div>
-            <div class="finance-card bg-saldo"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Sisa Saldo</span><h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3></div>
+            <div class="finance-card bg-saldo mt-2">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Sisa Saldo (Bulan Terpilih)</span>
+                <h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3>
+            </div>
+            <div class="finance-card mt-2" style="background-color: #fdf4ff; border-color: #f5d0fe;">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Saldo Keseluruhan (S.d Terpilih)</span>
+                <h3 class="m-0 fw-bold" style="color: #9333ea;" id="saldoAkumulasiDashboard">Rp 0</h3>
+            </div>
         </div>
 
         <div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
@@ -407,6 +414,12 @@ async function muatDashboard() {
         let elSaldo = document.getElementById('saldoBersihDashboard');
         elSaldo.innerText = "Rp " + data.saldoBersih.toLocaleString('id-ID');
         elSaldo.className = data.saldoBersih < 0 ? "text-danger m-0 fw-bold fs-3" : "text-primary m-0 fw-bold fs-3";
+        let elAkumulasi = document.getElementById('saldoAkumulasiDashboard');
+        if(elAkumulasi) {
+            elAkumulasi.innerText = "Rp " + data.saldoAkumulasi.toLocaleString('id-ID');
+            elAkumulasi.className = data.saldoAkumulasi < 0 ? "text-danger m-0 fw-bold fs-3" : "m-0 fw-bold fs-3";
+            if(data.saldoAkumulasi >= 0) elAkumulasi.style.color = "#9333ea";
+        }
 
         const ctx = document.getElementById('chartIuran').getContext('2d');
         if (chartInstance) chartInstance.destroy();
