@@ -696,25 +696,47 @@ function tampilkanTabelKelola() {
         return;
     }
     
+    // Ambil kategori sheet aktif untuk menentukan indeks kolom nominal
+    const sheet = document.getElementById('pilihSheetKelola').value;
     const start = (pageKelola - 1) * LIMIT_PER_PAGE;
     const end = start + LIMIT_PER_PAGE;
     const dataTampil = dataKelolaGlobal.slice(start, end);
-
+    
     dataTampil.forEach(row => {
-        let rowId = row[row.length - 1]; let rowData = row.slice(0, row.length - 1);
+        let rowId = row[row.length - 1]; 
+        let rowData = row.slice(0, row.length - 1);
         let tdHTML = "";
-        rowData.forEach(val => {
+        
+        // Menambahkan parameter index untuk mendeteksi posisi kolom
+        rowData.forEach((val, index) => {
             let text = val.toString();
-            if(text.length > 25 && !text.includes('http')) text = text.substring(0, 25) + '...';
+            
+            // LOGIKA BARU: Deteksi & format kolom nominal berdasarkan sheet terpilih
+            if ((sheet === "Data_Pembayaran" && index === 4) || 
+                ((sheet === "Data_Pemasukan_Lain" || sheet === "Data_Pengeluaran") && index === 2)) {
+                
+                // Hilangkan karakter non-angka lalu ubah ke tipe data Number
+                let num = Number(text.replace(/[^0-9]/g, ''));
+                if (!isNaN(num) && text.trim() !== "") {
+                    text = num.toLocaleString('id-ID'); // Mengubah 100000 menjadi 100.000
+                }
+            } else {
+                // Batasi panjang teks untuk kolom non-nominal biasa
+                if(text.length > 25 && !text.includes('http')) text = text.substring(0, 25) + '...';
+            }
+            
             if(text.includes('http')) text = `<a href="${text}" target="_blank">Lihat</a>`;
+   
             tdHTML += `<td>${text}</td>`;
         });
+        
+        // Tombol aksi edit tetap menerima `rowData` asli tanpa titik agar aman saat disimpan kembali
         tdHTML += `<td class="text-nowrap"><button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick='bukaFormEdit(${JSON.stringify(rowData)}, ${rowId})'>✏️</button><button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button></td>`;
         tbody.insertAdjacentHTML('beforeend', `<tr>${tdHTML}</tr>`);
     });
-    
     renderPaginasi('paginasiKelola', dataKelolaGlobal.length, pageKelola, 'ubahHalamanKelola');
 }
+    
 async function hapusDataAdmin(rowId) {
     if(!confirm("⚠️ Yakin ingin menghapus data di baris ke-" + rowId + " ini?")) return;
     const sheet = document.getElementById('pilihSheetKelola').value;
