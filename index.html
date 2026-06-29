@@ -265,6 +265,25 @@
         </div>
     </div>
 </div>
+
+<div class="row g-2 mb-3" id="filterWaktuKelolaRow">
+    <div class="col-6">
+        <label class="form-label text-muted">Filter Tahun:</label>
+        <select class="form-select form-select-sm" id="filterTahunKelola" onchange="muatTabelKelola()">
+            <option value="Semua">-- Semua Tahun --</option>
+        </select>
+    </div>
+    <div class="col-6">
+        <label class="form-label text-muted">Filter Bulan:</label>
+        <select class="form-select form-select-sm" id="filterBulanKelola" onchange="muatTabelKelola()">
+            <option value="Semua" selected>-- Semua Bulan --</option>
+            <option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
+            <option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
+            <option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
+            <option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
+        </select>
+    </div>
+</div>
             <div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data...</div>
             <div id="formEditKelola" class="card-custom mt-3 hidden" style="border: 2px solid #ef4444; background: #fef2f2;">
                 <h6 class="text-danger fw-bold border-bottom pb-2">Edit Data (Baris : <span id="editRowId"></span>)</h6>
@@ -525,9 +544,22 @@ async function prosesCekMandiriWarga() {
 async function bikinOpsiTahunOtomatis() {
     try {
         const daftarTahun = await apiGet('ambilDaftarTahunUnik');
-        const sel = document.getElementById('filterTahun'); sel.innerHTML = '<option value="Semua">-- Semua Tahun --</option>';
-        const thnSkg = new Date().getFullYear();
-        daftarTahun.forEach(t => { let opt = new Option(t, t); if (t === thnSkg) opt.selected = true; sel.appendChild(opt); });
+        
+        // Isi dropdown Dashboard
+        const sel = document.getElementById('filterTahun'); 
+        if (sel) {
+            sel.innerHTML = '<option value="Semua">-- Semua Tahun --</option>';
+            const thnSkg = new Date().getFullYear();
+            daftarTahun.forEach(t => { let opt = new Option(t, t); if (t === thnSkg) opt.selected = true; sel.appendChild(opt); });
+        }
+        
+        // Isi dropdown Kelola Data Admin
+        const selKelola = document.getElementById('filterTahunKelola');
+        if (selKelola) {
+            selKelola.innerHTML = '<option value="Semua">-- Semua Tahun --</option>';
+            daftarTahun.forEach(t => { let opt = new Option(t, t); selKelola.appendChild(opt); });
+        }
+        
         muatDashboard();
     } catch(e) { console.error(e); }
 }
@@ -626,14 +658,21 @@ async function muatTabelKelola() {
     
     try {
         const keywordCari = document.getElementById('kataKunciKelola').value;
-        const data = await apiGet('ambilSemuaDataUntukAdmin', { pilihanSheet: sheet, keyword: keywordCari });
+        const thnKelola = document.getElementById('filterTahunKelola') ? document.getElementById('filterTahunKelola').value : "Semua";
+        const blnKelola = document.getElementById('filterBulanKelola') ? document.getElementById('filterBulanKelola').value : "Semua";
+        
+        const data = await apiGet('ambilSemuaDataUntukAdmin', { 
+            pilihanSheet: sheet, 
+            keyword: keywordCari,
+            tahun: thnKelola,
+            bulan: blnKelola
+        });
         document.getElementById('loadingKelola').style.display = "none";
         
         let headers;
         if (sheet === "Data_Pembayaran") headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status", "Aksi"];
         else if (sheet === "Master_Warga") headers = ["Blok", "Aksi"];
         else headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
-        
         let headHtml = "<tr>";
         headers.forEach(h => headHtml += `<th>${h}</th>`);
         headHtml += "</tr>";
@@ -746,6 +785,18 @@ async function tambahDataWarga() {
     const res = await apiPost('tambahWarga', { blokBaru: blok });
     alert(res.pesan);
     if(res.sukses) muatDataWargaUntukAdmin(); // Fungsi untuk refresh tabel warga
+}
+
+function handleKategoriKelolaChange() {
+    const sheet = document.getElementById('pilihSheetKelola').value;
+    const filterRow = document.getElementById('filterWaktuKelolaRow');
+    
+    if (sheet === "Master_Warga") {
+        filterRow.classList.add('hidden'); // Sembunyikan filter jika memilih Master Warga
+    } else {
+        filterRow.classList.remove('hidden'); // Tampilkan filter untuk kategori kas & iuran
+    }
+    muatTabelKelola();
 }
 </script>
 </body>
