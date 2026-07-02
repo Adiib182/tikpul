@@ -129,10 +129,26 @@
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Saldo Keseluruhan (S.d Bulan Terpilih)</span>
                 <h3 class="m-0 fw-bold" style="color: #9333ea;" id="saldoAkumulasiDashboard">Rp 0</h3>
             </div>
-            <div class="finance-card bg-white mt-2" style="border: 1px solid #cbd5e1;">
-                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Warga Sudah Konfirmasi (Lunas Bulan Terpilih)</span>
-                <h3 class="text-dark m-0 fw-bold" id="totalWargaLunasDashboard">0 Warga</h3>
-            </div>
+            <div class="row g-2 mt-2">
+    <div class="col-4">
+        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Lunas</span>
+            <h6 class="text-success m-0 fw-bold" id="totalWargaLunasDashboard">0 Warga</h6>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Menunggu ACC</span>
+            <h6 class="text-warning m-0 fw-bold" id="totalWargaPendingDashboard">0 Warga</h6>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Bayar</span>
+            <h6 class="text-danger m-0 fw-bold" id="totalWargaBelumBayarDashboard">0 Warga</h6>
+        </div>
+    </div>
+</div>
         </div>
 
         <div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
@@ -433,8 +449,14 @@ async function muatDashboard() {
         const data = await apiGet('ambilDataDashboard', { tahun: tahun, bulan: bulan });
 
         if (document.getElementById('totalWargaLunasDashboard')) {
-            document.getElementById('totalWargaLunasDashboard').innerText = data.totalWargaKonfirmasi + " Warga";
-        }
+    document.getElementById('totalWargaLunasDashboard').innerText = data.totalWargaKonfirmasi + " Warga";
+}
+if (document.getElementById('totalWargaPendingDashboard')) {
+    document.getElementById('totalWargaPendingDashboard').innerText = data.totalWargaPending + " Warga";
+}
+if (document.getElementById('totalWargaBelumBayarDashboard')) {
+    document.getElementById('totalWargaBelumBayarDashboard').innerText = data.totalWargaBelumBayar + " Warga";
+}
         
         document.getElementById('totalDashboard').innerText = "Rp " + data.totalDisaring.toLocaleString('id-ID');
         document.getElementById('totalPengeluaranDashboard').innerText = "Rp " + data.totalPengeluaran.toLocaleString('id-ID');
