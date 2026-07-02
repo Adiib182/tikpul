@@ -129,6 +129,10 @@
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Saldo Keseluruhan (S.d Bulan Terpilih)</span>
                 <h3 class="m-0 fw-bold" style="color: #9333ea;" id="saldoAkumulasiDashboard">Rp 0</h3>
             </div>
+            <div class="finance-card bg-white mt-2" style="border: 1px solid #cbd5e1;">
+                <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Warga Sudah Konfirmasi (Lunas Bulan Terpilih)</span>
+                <h3 class="text-dark m-0 fw-bold" id="totalWargaLunasDashboard">0 Warga</h3>
+            </div>
         </div>
 
         <div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
@@ -427,6 +431,11 @@ async function muatDashboard() {
     document.getElementById('tabelRincianKeluar').innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr>';
     try {
         const data = await apiGet('ambilDataDashboard', { tahun: tahun, bulan: bulan });
+
+        if (document.getElementById('totalWargaLunasDashboard')) {
+            document.getElementById('totalWargaLunasDashboard').innerText = data.totalWargaKonfirmasi + " Warga";
+        }
+        
         document.getElementById('totalDashboard').innerText = "Rp " + data.totalDisaring.toLocaleString('id-ID');
         document.getElementById('totalPengeluaranDashboard').innerText = "Rp " + data.totalPengeluaran.toLocaleString('id-ID');
         
@@ -594,17 +603,88 @@ document.getElementById('formIuran').addEventListener('submit', function(e) {
 });
 
 async function muatDataAdmin() {
-    document.getElementById('loadingAdmin').style.display = "block"; document.getElementById('daftarPending').innerHTML = "";
+    document.getElementById('loadingAdmin').style.display = "block"; 
+    document.getElementById('daftarPending').innerHTML = "";
     try {
         const data = await apiGet('ambilDataPending');
-        document.getElementById('loadingAdmin').style.display = "none"; const container = document.getElementById('daftarPending');
-        if (data.length === 0) { container.innerHTML = "<div class='alert alert-success text-center'>Semua lunas!</div>"; return; }
+        document.getElementById('loadingAdmin').style.display = "none"; 
+        const container = document.getElementById('daftarPending');
+        
+        if (data.length === 0) { 
+            container.innerHTML = "<div class='alert alert-success text-center'>Semua data telah diverifikasi!</div>"; 
+            return; 
+        }
+        
+        // Buat Panel Header dengan tombol Pilih Semua dan Aksi Masal
+        let htmlContent = `
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-white rounded border">
+                <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" id="cekSemuaPending" onchange="toggleSelectAllPending(this)">
+                    <label class="form-check-label fw-bold small text-dark mt-1" for="cekSemuaPending">Pilih Semua</label>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-success fw-bold me-1" onclick="prosesBulk('Setuju')">Terima Terpilih</button>
+                    <button class="btn btn-sm btn-danger fw-bold" onclick="prosesBulk('Tolak')">Tolak Terpilih</button>
+                </div>
+            </div>
+        `;
+
+        // Render card masing-masing data dengan tambahan Checkbox
         data.forEach(item => {
-            container.insertAdjacentHTML('beforeend', `<div class="card-konfirmasi"><h6>${item.nama} (${item.blok})</h6><p class="mb-1 small"><strong>Bulan:</strong> ${item.bulan} | <strong>Jumlah:</strong> Rp ${Number(item.jumlah).toLocaleString('id-ID')}</p><div class="mt-2"><a href="${item.buktiUrl}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 me-1">Buka Foto</a><button onclick="verifikasi(${item.rowId}, this)" class="btn btn-sm btn-success py-0 px-2 me-1">Setuju</button><button onclick="tolak(${item.rowId}, this)" class="btn btn-sm btn-danger py-0 px-2">Tolak</button></div></div>`);
+            htmlContent += `
+                <div class="card-konfirmasi d-flex align-items-start">
+                    <div class="form-check me-3 mt-1">
+                        <input class="form-check-input cb-pending" type="checkbox" value="${item.rowId}">
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6>${item.nama} (${item.blok})</h6>
+                        <p class="mb-1 small"><strong>Bulan:</strong> ${item.bulan} | <strong>Jumlah:</strong> Rp ${Number(item.jumlah).toLocaleString('id-ID')}</p>
+                        <div class="mt-2">
+                            <a href="${item.buktiUrl}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 me-1">Buka Foto</a>
+                            <button onclick="verifikasi(${item.rowId}, this)" class="btn btn-sm btn-success py-0 px-2 me-1">Setuju</button>
+                            <button onclick="tolak(${item.rowId}, this)" class="btn btn-sm btn-danger py-0 px-2">Tolak</button>
+                        </div>
+                    </div>
+                </div>`;
         });
-    } catch(e) { console.error(e); }
+        
+        container.innerHTML = htmlContent;
+    } catch(e) { 
+        console.error(e); 
+        document.getElementById('loadingAdmin').innerText = "Gagal memuat data.";
+    }
 }
 
+// FUNGSI BARU: Checklist semua data
+function toggleSelectAllPending(checkboxMaster) {
+    document.querySelectorAll('.cb-pending').forEach(el => el.checked = checkboxMaster.checked);
+}
+
+// FUNGSI BARU: Proses Terima/Tolak masal
+async function prosesBulk(aksi) {
+    let cbTerpilih = document.querySelectorAll('.cb-pending:checked');
+    let rowIds = Array.from(cbTerpilih).map(cb => parseInt(cb.value));
+    
+    if (rowIds.length === 0) {
+        alert("Silakan pilih setidaknya satu data yang ingin diproses!");
+        return;
+    }
+    
+    if (!confirm(`⚠️ Anda yakin ingin me-${aksi.toLowerCase()} ${rowIds.length} data terpilih secara bersamaan?`)) return;
+
+    document.getElementById('daftarPending').innerHTML = "<div class='text-center text-muted my-3'>Sedang memproses data masal, mohon tunggu...</div>";
+
+    try {
+        let endpointUrl = (aksi === 'Setuju') ? 'bulkSetujui' : 'bulkTolak';
+        const res = await apiPost(endpointUrl, { rowIds: rowIds });
+        
+        // Memuat ulang data pending setelah berhasil/gagal
+        muatDataAdmin();
+    } catch(e) {
+        alert("Gagal memproses data masal. Periksa koneksi internet Anda.");
+        muatDataAdmin();
+    }
+}
 async function verifikasi(rowId, btn) {
     btn.disabled = true;
     try {
