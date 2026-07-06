@@ -125,6 +125,20 @@ body { background-color: var(--bg-light); padding: 0; margin: 0; font-family: 'S
 </div>
 </div>
 </div>
+<div class="row g-2 mt-2">
+    <div class="col-6">
+        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Dihuni</span>
+            <h6 class="text-primary m-0 fw-bold" id="totalHuniDashboard">0 Warga</h6>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Dihuni</span>
+            <h6 class="text-secondary m-0 fw-bold" id="totalBelumHuniDashboard">0 Warga</h6>
+        </div>
+    </div>
+</div>
 <div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
 <div class="border-top pt-3 mt-3">
 <h6 class="fw-bold text-success mb-2 d-flex align-items-center">🟢 Rincian Uang Masuk yang Diterima</h6>
@@ -488,6 +502,8 @@ async function muatDashboard() {
     if (document.getElementById('totalWargaLunasDashboard')) document.getElementById('totalWargaLunasDashboard').innerText = data.totalWargaKonfirmasi + " Warga";
     if (document.getElementById('totalWargaPendingDashboard')) document.getElementById('totalWargaPendingDashboard').innerText = data.totalWargaPending + " Warga";
     if (document.getElementById('totalWargaBelumBayarDashboard')) document.getElementById('totalWargaBelumBayarDashboard').innerText = data.totalWargaBelumBayar + " Warga";
+    if (document.getElementById('totalHuniDashboard')) document.getElementById('totalHuniDashboard').innerText = data.totalWargaHuni + " Warga";
+    if (document.getElementById('totalBelumHuniDashboard')) document.getElementById('totalBelumHuniDashboard').innerText = data.totalWargaBelumHuni + " Warga";
     
     document.getElementById('totalDashboard').innerText = "Rp " + data.totalDisaring.toLocaleString('id-ID');
     document.getElementById('totalPengeluaranDashboard').innerText = "Rp " + data.totalPengeluaran.toLocaleString('id-ID');
