@@ -756,7 +756,11 @@ document.getElementById('headKelola').innerHTML = headHtml;
 
 // Tambahkan validasi ini
 if (!Array.isArray(data)) {
-  document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center text-danger py-3'>Gagal memuat data dari server. Silakan muat ulang.</td></tr>";
+  // Akan memunculkan wujud asli data yang dikirim server (misal: JSON Error)
+  let pesanServer = typeof data === 'object' ? JSON.stringify(data) : data;
+  document.getElementById('bodyKelola').innerHTML = `<tr><td colspan='10' class='text-center text-danger py-3'>
+    Gagal memuat data. Respons Server:<br><code>${pesanServer}</code>
+  </td></tr>`;
   return; 
 }
 
