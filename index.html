@@ -1274,6 +1274,49 @@ async function tambahDataWarga() {
   }
 }
 
+async function tambahDataPolling() {
+  // 1. Ambil nilai dari kolom input
+  const judul = document.getElementById('inputJudulPolling').value;
+  const deskripsi = document.getElementById('inputDeskripsiPolling').value;
+
+  // 2. Cek apakah input kosong
+  if(!judul.trim() || !deskripsi.trim()) { 
+    alert("Judul dan Deskripsi Polling wajib diisi!"); 
+    return; 
+  }
+  
+  // 3. Ubah status tombol saat memproses
+  const btn = document.getElementById('btnBuatPolling');
+  btn.disabled = true;
+  btn.innerText = "Menerbitkan...";
+
+  try {
+    // 4. Kirim data ke Google Apps Script (Backend)
+    const res = await apiPost('tambahPolling', { data: { judul: judul, deskripsi: deskripsi } });
+    alert(res.pesan);
+    
+    // 5. Jika sukses, bersihkan form dan refresh tabel
+    if(res.sukses) {
+      document.getElementById('inputJudulPolling').value = ""; 
+      document.getElementById('inputDeskripsiPolling').value = "";
+      
+      // Jika admin sedang membuka tabel Data_Polling, langsung refresh tabelnya
+      if(document.getElementById('pilihSheetKelola').value === 'Data_Polling') { 
+        muatTabelKelola(); 
+      }
+      
+      // Refresh halaman polling di menu warga agar langsung muncul
+      muatDataPolling();
+    }
+  } catch (e) {
+    alert("Gagal terhubung ke server.");
+  }
+  
+  // 6. Kembalikan status tombol
+  btn.disabled = false;
+  btn.innerText = "Terbitkan Polling";
+}
+
 function handleKategoriKelolaChange() {
   const sheet = document.getElementById('pilihSheetKelola').value;
   const filterRow = document.getElementById('filterWaktuKelolaRow');
