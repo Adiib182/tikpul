@@ -752,8 +752,17 @@ async function muatTabelKelola() {
     else if (sheet === "Data_Polling") headers = ["ID Polling", "Judul", "Deskripsi", "Status", "Aksi"];
     else headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
     let headHtml = "<tr>"; headers.forEach(h => headHtml += `<th>${h}</th>`); headHtml += "</tr>";
-    document.getElementById('headKelola').innerHTML = headHtml;
-    dataKelolaGlobal = data; pageKelola = 1; tampilkanTabelKelola();
+document.getElementById('headKelola').innerHTML = headHtml;
+
+// Tambahkan validasi ini
+if (!Array.isArray(data)) {
+  document.getElementById('bodyKelola').innerHTML = "<tr><td colspan='10' class='text-center text-danger py-3'>Gagal memuat data dari server. Silakan muat ulang.</td></tr>";
+  return; 
+}
+
+dataKelolaGlobal = data; 
+pageKelola = 1; 
+tampilkanTabelKelola();
   } catch(e) { console.error(e); }
 }
 
@@ -787,7 +796,12 @@ function tampilkanTabelKelola() {
       tdHTML += `<td>${text}</td>`;
     }
     
-    tdHTML += `<td class="text-nowrap"><button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick='bukaFormEdit(${JSON.stringify(rowData)}, ${rowId})'>✏️</button><button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button></td>`;
+    let safeRowData = JSON.stringify(rowData).replace(/"/g, '&quot;'); // Escape double quotes
+
+tdHTML += `<td class="text-nowrap">
+  <button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick="bukaFormEdit(${safeRowData}, ${rowId})">✏️</button>
+  <button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button>
+</td>`;
     tbody.insertAdjacentHTML('beforeend', `<tr>${tdHTML}</tr>`);
   });
   renderPaginasi('paginasiKelola', dataKelolaGlobal.length, pageKelola, 'ubahHalamanKelola');
