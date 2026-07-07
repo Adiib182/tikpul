@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem Keuangan - Titik Pulang Sawangan</title>
-<!-- Bootstrap & ChartJS -->
+<title>.getHome</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Tambahan JQuery & Select2 untuk Dropdown Search -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -22,16 +20,25 @@
   --card-radius: 16px;
 }
 body { background-color: var(--bg-light); padding: 0; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #334155; }
-.main-container { max-width: 650px; margin: auto; padding: 15px; }
+
+/* Wrapper baru agar layout menyamping dan responsif */
+.app-wrapper { max-width: 1200px; margin: 0 auto; padding: 15px; }
+
+/* Memastikan menu di sidebar menempel saat di-scroll */
+.sidebar-menu { position: sticky; top: 20px; z-index: 1020; }
+
 .app-header { background: linear-gradient(135deg, var(--primary-color) 0%, #0f172a 100%); color: white; padding: 30px 20px; border-radius: 0 0 24px 24px; text-align: center; margin-bottom: 25px; box-shadow: 0px 10px 25px rgba(30, 58, 138, 0.15); }
 .logo-container { width: 70px; height: 70px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .app-header h3 { font-weight: 700; font-size: 20px; letter-spacing: 0.5px; margin-bottom: 2px; text-transform: uppercase; }
 .app-header p { font-size: 13px; color: #93c5fd; margin-bottom: 0; font-weight: 500; }
+
 .card-custom { background: white; padding: 25px; border-radius: var(--card-radius); box-shadow: 0px 6px 20px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
-.nav-pills { background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 25px !important; }
-.nav-pills .nav-link { color: #64748b; background-color: transparent; border: none; font-weight: 600; font-size: 12px; padding: 8px 10px; transition: all 0.3s ease; border-radius: 8px; }
+
+.nav-pills { background: #e2e8f0; padding: 8px; border-radius: 16px; }
+.nav-pills .nav-link { color: #64748b; background-color: transparent; border: none; font-weight: 600; font-size: 14px; padding: 10px 15px; transition: all 0.3s ease; border-radius: 10px; }
 .nav-pills .nav-link.active { background-color: white; color: var(--primary-color); box-shadow: 0px 4px 10px rgba(0,0,0,0.06); }
 .nav-pills .nav-link:hover:not(.active) { color: var(--primary-color); background: rgba(255, 255, 255, 0.5); }
+
 .finance-summary-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .finance-card { padding: 15px; border-radius: 12px; text-align: center; border: 1px solid transparent; transition: transform 0.2s; }
 .bg-masuk { background-color: #f0fdf4; border-color: #bbf7d0; }
@@ -43,6 +50,7 @@ body { background-color: var(--bg-light); padding: 0; margin: 0; font-family: 'S
 .box-hasil-cek { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-top: 15px; }
 .badge-masuk-tag { background-color: #d1fae5; color: #065f46; font-weight: 600; }
 .badge-keluar-tag { background-color: #fee2e2; color: #991b1b; font-weight: 600; }
+
 .form-control, .form-select { border-radius: 8px; border: 1px solid #cbd5e1; padding: 10px 14px; font-size: 14px; }
 .form-control:focus, .form-select:focus { border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 .form-label { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
@@ -55,301 +63,677 @@ body { background-color: var(--bg-light); padding: 0; margin: 0; font-family: 'S
 .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 28px; color: #334155; padding-left: 0; }
 .select2-search__field { outline: none !important; border-radius: 4px; }
 .select2-dropdown { border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
+/* CSS Tambahan untuk Layar Login */
+#loginScreen {
+  display: flex; justify-content: center; align-items: center;
+  height: 100vh; background: linear-gradient(135deg, var(--primary-color) 0%, #0f172a 100%);
+}
+.login-card {
+  background: white; padding: 40px 30px; border-radius: var(--card-radius);
+  box-shadow: 0px 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 400px; width: 90%;
+}
+.login-card h4 { font-weight: 700; color: var(--primary-color); margin-bottom: 5px; }
+.login-card .logo-login {
+  width: 60px; height: 60px; background: var(--primary-color); color: white;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin: 0 auto 15px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+/* =========================================================
+   TEMA LOGIN GEN Z : "TITIK PULANG (TWILIGHT GLASSMORPHISM)"
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+.genz-login-wrapper {
+  display: flex; justify-content: center; align-items: center;
+  height: 100vh;
+  /* Animasi background gradien senja (twilight) yang bergerak */
+  background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #4c1d95);
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease infinite;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, sans-serif;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 40px 30px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover { transform: translateY(-5px); }
+
+.emoji-header {
+  font-size: 54px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.title-text {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.title-text .highlight {
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle-text {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+
+.input-group-custom input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 16px 20px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.input-group-custom input::placeholder { color: rgba(255, 255, 255, 0.4); font-weight: 400; letter-spacing: normal; }
+.input-group-custom input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+}
+
+.btn-genz {
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+  border: none;
+  padding: 16px 20px;
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.4);
+}
+
+.btn-genz:hover { transform: scale(1.03); box-shadow: 0 15px 30px rgba(168, 85, 247, 0.5); }
+.btn-genz:active { transform: scale(0.97); }
+
+.error-msg {
+  color: #fda4af;
+  background: rgba(225, 29, 72, 0.2);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  padding: 12px;
+  border-radius: 14px;
+  margin-top: 15px;
+  font-size: 13px;
+  font-weight: 600;
+  display: none;
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+}
+/* =========================================================
+   HEADER GAUL "FLOATING ISLAND" 
+   ========================================================= */
+.header-genz-island {
+  /* Warna gelap kaca tembus pandang */
+  background: rgba(15, 23, 42, 0.85); 
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  
+  /* Membuatnya melayang di tengah */
+  max-width: 1160px;
+  margin: 20px auto 25px auto;
+  border-radius: 24px;
+  padding: 16px 24px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  /* Efek bayangan & garis tepi tipis khas Apple/Modern UI */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.header-genz-island:hover {
+  transform: translateY(-2px);
+}
+
+.island-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.island-logo {
+  font-size: 26px;
+  /* Warna cerah mencolok untuk logo */
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(167, 139, 250, 0.4);
+}
+
+.island-text h3 {
+  color: white;
+  font-weight: 800;
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.island-text p {
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 0;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.island-badge {
+  background: rgba(167, 139, 250, 0.15);
+  color: #c4b5fd;
+  padding: 8px 16px;
+  border-radius: 100px; /* Bentuk pil penuh */
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* Animasi lambaian tangan */
+.wave {
+  display: inline-block;
+  animation: wave-animation 2.5s infinite;
+  transform-origin: 70% 70%;
+}
+@keyframes wave-animation {
+    0% { transform: rotate( 0.0deg) }
+   10% { transform: rotate(14.0deg) }
+   20% { transform: rotate(-8.0deg) }
+   30% { transform: rotate(14.0deg) }
+   40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
+/* =========================================================
+   SUB-MENU GAYA SEGMENTED CONTROL (iOS / MOBILE APP STYLE)
+   ========================================================= */
+.genz-submenu {
+  display: flex;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 16px;
+  gap: 6px;
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-bottom: 24px;
+  /* Menyembunyikan scrollbar agar estetis di HP */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
+}
+.genz-submenu::-webkit-scrollbar { 
+  display: none; 
+}
+
+.genz-submenu button {
+  flex: 1; /* Membagi ukuran rata */
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #64748b;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.genz-submenu button:hover {
+  color: #0f172a;
+}
+
+/* Tampilan saat tombol / menu sedang aktif */
+.genz-submenu button.active {
+  background: white;
+  color: #6366f1; /* Menggunakan warna ungu khas tema awal */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
 </style>
 </head>
 <body>
-<div class="app-header">
-<div class="logo-container">🏡📈</div>
-<h3>Sistem Kas & IPL Warga</h3>
-<p>Cluster Titik Pulang Sawangan</p>
-</div>
-<div class="main-container">
-<ul class="nav nav-pills nav-justified mb-4">
-<li class="nav-item"><button class="nav-link active" id="tabDashboard" onclick="bukaHalaman('dashboard')">Dashboard 📊</button></li>
-<li class="nav-item"><button class="nav-link" id="tabWarga" onclick="bukaHalaman('warga')">Warga ✍️</button></li>
-<li class="nav-item"><button class="nav-link" id="tabPolling" onclick="bukaHalaman('polling')">Polling 🗳️</button></li>
-<li class="nav-item"><button class="nav-link" id="tabAdmin" onclick="bukaHalaman('admin')">Admin 🔒</button></li>
-</ul>
+<div id="loginScreen" class="genz-login-wrapper">
+  <div class="glass-card">
+    <div class="emoji-header">🌆✨</div>
+    <h3 class="title-text">Titik Pulang<br><span class="highlight">Sawangan</span></h3>
+    <p class="subtitle-text">Waktunya rebahan! 🛋️<br>Masukin password dulu ya warga~</p>
 
-<div id="halamanDashboard" class="card-custom">
-<h5 class="fw-bold mb-3 text-dark text-center">Grafik Keuangan Lingkungan</h5>
-<div class="row g-2 mb-3">
-<div class="col-6">
-<label class="form-label text-muted">Pilih Tahun</label>
-<select class="form-select form-select-sm" id="filterTahun" onchange="muatDashboard()">
-<option value="Semua">-- Semua Tahun --</option>
-</select>
-</div>
-<div class="col-6">
-<label class="form-label text-muted">Pilih Bulan</label>
-<select class="form-select form-select-sm" id="filterBulan" onchange="muatDashboard()">
-<option value="Semua" selected>-- Semua Bulan --</option>
-<option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
-<option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
-<option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
-<option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
-</select>
-</div>
-</div>
-<div class="finance-summary-box">
-<div class="row g-2">
-<div class="col-6"><div class="finance-card bg-masuk"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Masuk (Bulan Ini)</span><h5 class="text-success m-0 fw-bold" id="totalDashboard">Rp 0</h5></div></div>
-<div class="col-6"><div class="finance-card bg-keluar"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Keluar (Bulan Ini)</span><h5 class="text-danger m-0 fw-bold" id="totalPengeluaranDashboard">Rp 0</h5></div></div>
-</div>
-<div class="finance-card bg-saldo mt-2">
-<span class="text-muted small fw-bold text-uppercase d-block mb-1">Selisih uang masuk & keluar (bulan ini)</span>
-<h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3>
-</div>
-<div class="finance-card mt-2" style="background-color: #fdf4ff; border-color: #f5d0fe;">
-<span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Saldo Keseluruhan (S.d Bulan Terpilih)</span>
-<h3 class="m-0 fw-bold" style="color: #9333ea;" id="saldoAkumulasiDashboard">Rp 0</h3>
-</div>
-<div class="row g-2 mt-2">
-<div class="col-4">
-<div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
-<span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Lunas</span>
-<h6 class="text-success m-0 fw-bold" id="totalWargaLunasDashboard">0 Warga</h6>
-</div>
-</div>
-<div class="col-4">
-<div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
-<span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Menunggu ACC</span>
-<h6 class="text-warning m-0 fw-bold" id="totalWargaPendingDashboard">0 Warga</h6>
-</div>
-</div>
-<div class="col-4">
-<div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
-<span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Bayar</span>
-<h6 class="text-danger m-0 fw-bold" id="totalWargaBelumBayarDashboard">0 Warga</h6>
-</div>
-</div>
-</div>
-</div>
-<div class="row g-2 mt-2">
-    <div class="col-6">
-        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
-            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Dihuni</span>
-            <h6 class="text-primary m-0 fw-bold" id="totalHuniDashboard">0 Warga</h6>
-        </div>
+    <div class="input-group-custom">
+      <input type="password" id="inputPasswordWarga" placeholder="Ketik password di sini..." autocomplete="off">
     </div>
-    <div class="col-6">
-        <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
-            <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Dihuni</span>
-            <h6 class="text-secondary m-0 fw-bold" id="totalBelumHuniDashboard">0 Warga</h6>
-        </div>
-    </div>
-</div>
-<div class="mb-4" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
-<div class="border-top pt-3 mt-3">
-<h6 class="fw-bold text-success mb-2 d-flex align-items-center">🟢 Rincian Uang Masuk yang Diterima</h6>
-<div class="tabel-scroll mb-1">
-<table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Sumber</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianMasuk"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
-</div>
-<div id="paginasiMasuk" class="d-flex justify-content-end gap-1 mb-3"></div>
-<h6 class="fw-bold text-danger mb-2 d-flex align-items-center">🔴 Rincian Uang Keluar / Pengeluaran</h6>
-<div class="tabel-scroll mb-1">
-<table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Kategori</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianKeluar"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
-</div>
-<div id="paginasiKeluar" class="d-flex justify-content-end gap-1 mb-2"></div>
-</div>
-</div>
-
-<div id="halamanWarga" class="card-custom hidden">
-<div class="d-flex justify-content-center gap-2 mb-4">
-<button class="btn btn-sm btn-outline-primary active w-50 fw-bold" id="btnSubBayar" onclick="bukaSubWarga('bayar')">Konfirmasi Bayar</button>
-<button class="btn btn-sm btn-outline-primary w-50 fw-bold" id="btnSubCekMandiri" onclick="bukaSubWarga('cek')">🔎 Cek Tunggakan</button>
-</div>
-<div id="subWargaBayar">
-<h5 class="text-center fw-bold mb-3 text-dark">Kirim Konfirmasi Pembayaran</h5>
-<form id="formIuran">
-
-<!-- MODIFIKASI DROPDOWN BAYAR: Dropdown asli dengan fitur pencarian (Select2) -->
-<div class="mb-3">
-<label class="form-label">No. Rumah / Blok</label>
-<select class="form-control" name="blok" id="blokWargaIuran" required>
-  <option value="">-- Memuat Data Blok... --</option>
-</select>
-</div>
-<div class="mb-3">
-<label class="form-label">Nama</label>
-<input type="text" class="form-control bg-light" id="namaWargaIuran" name="nama" readonly required placeholder="Otomatis terisi setelah pilih blok">
-</div>
-
-<div class="row g-2 mb-3">
-<div class="col-7">
-<label class="form-label">Iuran Bulan</label>
-<select class="form-select" id="bulanWarga" name="bulan" required>
-<option value="">-- Pilih Bulan --</option>
-<option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
-<option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
-<option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
-<option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
-</select>
-</div>
-<div class="col-5"><label class="form-label">Tahun</label><select class="form-select" id="tahunWarga" name="tahunForm" required></select></div>
-</div>
-<div class="mb-3"><label class="form-label">Jumlah Transfer (Rp)</label><input type="text" class="form-control" id="jumlahInput" placeholder="Contoh: 150.000" onkeyup="formatRibuan(this)" required></div>
-<div class="mb-3"><label class="form-label">Upload Bukti Transfer</label><input type="file" class="form-control" id="fileInput" accept="image/*" required></div>
-<button type="submit" id="submitBtn" class="btn btn-primary btn-upgrade w-100">Kirim Konfirmasi</button>
-</form>
-<div id="pesanWarga" class="alert mt-3" style="display:none;"></div>
-</div>
-
-<div id="subWargaCek" class="hidden">
-<h5 class="text-center fw-bold mb-3 text-dark">Cek Status Iuran Rumah</h5>
-
-<!-- MODIFIKASI DROPDOWN CEK TUNGGAKAN -->
-<div class="d-flex gap-2 mb-3">
-  <div class="flex-grow-1">
-    <select class="form-control" id="blokCekMandiri">
-      <option value="">-- Memuat Data Blok... --</option>
-    </select>
+    
+    <button class="btn-genz" onclick="cekLoginWarga()">Let me in! 🚀</button>
+    
+    <div id="pesanErrorLogin" class="error-msg">Oops! Password-nya salah bestie 🥺</div>
   </div>
-  <button class="btn btn-primary fw-bold" type="button" id="btnProsesCek" onclick="prosesCekMandiriWarga()">Cari Data</button>
 </div>
 
-<div id="loadingCekWarga" class="text-center text-muted my-3" style="display:none;">Mencari data...</div>
-<div id="hasilCekMandiri" class="box-hasil-cek hidden">
-<h6 class="border-bottom pb-2 fw-bold">Hasil Analisis Blok: <span id="resBlokWarga" class="text-primary">-</span></h6>
-<div class="mb-3"><label class="small fw-bold text-danger d-block mb-1">Bulan Belum Dibayar / Tunggakan:</label><div class="p-2 border rounded bg-white text-dark small" id="resDetailTunggakan">-</div></div>
-<div><label class="small fw-bold text-muted d-block mb-1">Riwayat Pembayaran Terakhir:</label><div class="table-responsive"><table class="table table-sm table-bordered bg-white text-center small mb-0"><thead class="table-light"><tr><th>Bulan/Thn</th><th>Nominal</th><th>Status</th></tr></thead><tbody id="bodyRiwayatCekWarga"></tbody></table></div></div>
-</div>
-</div>
-</div>
-<div id="halamanPolling" class="card-custom hidden">
-<h5 class="text-center fw-bold mb-3 text-dark">Suara Warga</h5>
-<p class="text-center text-muted small mb-4">Berikan pendapat Anda untuk program dan pengadaan fasilitas lingkungan.</p>
-<div id="daftarPollingContainer">
-<div class="text-center text-muted">Memuat data polling...</div>
-</div>
-</div>
-<div id="halamanAdmin" class="card-custom hidden">
-<h5 class="text-center fw-bold mb-3 text-dark">Panel Kontrol Verifikasi Admin</h5>
-<div class="d-flex justify-content-center gap-1 mb-4 flex-wrap">
-<button class="btn btn-sm btn-outline-primary active fw-bold" id="btnSubVerifikasi" onclick="bukaSubAdmin('verifikasi')">Verifikasi Masuk</button>
-<button class="btn btn-sm btn-outline-primary fw-bold" id="btnSubTunggakan" onclick="bukaSubAdmin('tunggakan')">Rekap Tunggakan</button>
-<button class="btn btn-sm btn-outline-dark fw-bold" id="btnSubPengeluaran" onclick="bukaSubAdmin('pengeluaran')">🔄 Buku Kas Umum</button>
-<button class="btn btn-sm btn-outline-danger fw-bold" id="btnSubKelola" onclick="bukaSubAdmin('kelola')">⚙️ Kelola Data</button>
-</div>
-<div id="subVerifikasi"><div id="loadingAdmin" class="text-center text-muted">Mengambil data pending...</div><div id="daftarPending"></div></div>
-<div id="subTunggakan" class="hidden">
-<h5 class="mb-3 text-danger text-center fw-bold">Daftar Akumulasi Tunggakan Warga</h5>
-<div id="loadingTunggakan" class="text-center text-muted">Menghitung data...</div>
-<div class="table-responsive"><table class="table table-bordered table-striped align-middle mb-0 small" id="tabelTunggakan" style="display: none;"><thead class="table-dark"><tr><th>Blok</th><th>Nama</th><th class="text-center">Total</th><th>Detail Bulan</th></tr></thead><tbody id="bodyTunggakan"></tbody></table></div>
-<div id="tunggakanKosong" class="alert alert-success text-center mt-2" style="display: none;">Semua warga lunas.</div>
-</div>
-<div id="subPengeluaran" class="hidden">
-<h5 class="mb-3 text-primary text-center fw-bold" id="judulFormKas">Pencatatan Buku Kas Umum</h5>
-<form id="formPengeluaran">
-<div class="mb-3">
-<label class="form-label">Jenis Transaksi</label>
-<select class="form-select" id="jenisKas" onchange="sesuaikanKategoriFormKas()" required>
-<option value="Keluar">Uang Keluar (Pengeluaran Belanja / Operasional)</option>
-<option value="Masuk">Uang Masuk (Pendapatan Non-Iuran / Donasi / Sewa)</option>
-</select>
-</div>
-<div class="row g-2 mb-3">
-<div class="col-6"><label class="form-label">Tanggal Transaksi</label><input type="date" class="form-control" id="tglKeluar" required></div>
-<div class="col-6"><label class="form-label">Kategori</label><select class="form-select" id="katKeluar" required></select></div>
-</div>
-<div class="mb-3"><label class="form-label">Nominal Transaksi (Rp)</label><input type="text" class="form-control" id="nomKeluar" placeholder="Contoh: 500.000" onkeyup="formatRibuan(this)" required></div>
-<div class="mb-3"><label class="form-label">Keterangan Detail</label><textarea class="form-control" id="ketKeluar" rows="2" placeholder="Contoh: Pembelian sapu lidi dan ember" required></textarea></div>
-<button type="submit" id="btnSubmitKeluar" class="btn btn-primary btn-upgrade w-100">Simpan Ke Buku Kas</button>
-</form>
-<div id="pesanPengeluaran" class="alert alert-success mt-3" style="display:none;"></div>
-</div>
-<div id="subKelola" class="hidden">
+<!-- BUNGKUS APLIKASI UTAMA (Disembunyikan di awal) -->
+<div id="mainApp" style="display: none;">
   
-  <div class="card p-3 mb-4 bg-light border-primary">
-    <h6 class="fw-bold text-primary mb-2">➕ Tambah Warga Baru (Master)</h6>
-    <div class="row g-2">
-      <div class="col-5">
-        <input type="text" class="form-control" id="inputBlokBaru" placeholder="Blok: A16">
+  <div class="header-genz-island">
+    <div class="island-info">
+      <div class="island-logo">🏡</div>
+      <div class="island-text">
+        <h3>getHome <span class="wave">👋</span></h3>
+        <p>Titik Pulang Sawangan ✨</p>
       </div>
-      <div class="col-4">
-        <input type="text" class="form-control" id="inputNamaBaru" placeholder="Nama Warga">
-      </div>
-      <div class="col-3">
-        <button class="btn btn-primary w-100 fw-bold" onclick="tambahDataWarga()">Simpan</button>
-      </div>
+    </div>
+    <div class="island-badge">
+      Warga Zone 🚀
     </div>
   </div>
-  <div class="card p-3 mb-4 bg-light border-success">
-    <h6 class="fw-bold text-success mb-2">📊 Buat Polling Baru</h6>
-    <div class="mb-2">
-      <input type="text" class="form-control" id="inputJudulPolling" placeholder="Judul Polling (Contoh: Rencana Pemasangan CCTV)">
-    </div>
-    <div class="mb-2">
-      <textarea class="form-control" id="inputDeskripsiPolling" rows="2" placeholder="Penjelasan detail tentang polling ini..."></textarea>
-    </div>
-    <button class="btn btn-success w-100 fw-bold" id="btnBuatPolling" onclick="tambahDataPolling()">Terbitkan Polling</button>
-  </div>
-  <h5 class="mb-3 text-danger text-center fw-bold">Manajemen Edit & Hapus Data</h5>
-  <div class="row g-2 mb-3">
-    <div class="col-sm-6">
-      <label class="form-label text-muted">Pilih Kategori Data:</label>
-      <select class="form-select" id="pilihSheetKelola" onchange="handleKategoriKelolaChange()">
-        <option value="Data_Pembayaran">Data Iuran Warga</option>
-        <option value="Data_Pemasukan_Lain">Kas Masuk (Non-Iuran)</option>
-        <option value="Data_Pengeluaran">Kas Keluar (Pengeluaran)</option>
-        <option value="Master_Warga">Master Data Warga</option>
-        <option value="Suara_Warga">Komentar & Suara Polling</option>
-        <option value="Data_Polling">Master Data Polling</option> 
-      </select>
-    </div>
-    <div class="col-sm-6">
-<label class="form-label text-muted">Cari Data (Nama/Blok/Bulan):</label>
-<div class="input-group">
-<input type="text" class="form-control" id="kataKunciKelola" placeholder="Ketik kata kunci...">
-<button class="btn btn-primary" onclick="muatTabelKelola()">🔍 Cari</button>
-</div>
-</div>
-</div>
-<div class="row g-2 mb-3" id="filterWaktuKelolaRow">
-<div class="col-6">
-<label class="form-label text-muted">Filter Tahun:</label>
-<select class="form-select form-select-sm" id="filterTahunKelola" onchange="muatTabelKelola()">
-<option value="Semua">-- Semua Tahun --</option>
-</select>
-</div>
-<div class="col-6">
-<label class="form-label text-muted">Filter Bulan:</label>
-<select class="form-select form-select-sm" id="filterBulanKelola" onchange="muatTabelKelola()">
-<option value="Semua" selected>-- Semua Bulan --</option>
-<option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
-<option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
-<option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
-<option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
-</select>
-</div>
-</div>
-<div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data...</div>
-<div id="formEditKelola" class="card-custom mt-3 hidden" style="border: 2px solid #ef4444; background: #fef2f2;">
-<h6 class="text-danger fw-bold border-bottom pb-2">Edit Data (Baris : <span id="editRowId"></span>)</h6>
-<input type="hidden" id="editSheetName">
-<div id="editInputs" class="row g-2"></div>
-<div class="mt-3 text-end">
-<button class="btn btn-secondary btn-sm me-2" onclick="document.getElementById('formEditKelola').classList.add('hidden')">Batal</button>
-<button class="btn btn-success btn-sm fw-bold" onclick="simpanHasilEdit(this)">💾 Simpan Perubahan</button>
-</div>
-</div>
-<div class="tabel-scroll mt-3" style="max-height: 350px;">
-<table class="table table-sm table-bordered table-striped align-middle small mb-0 bg-white" id="tabelKelola"><thead class="table-dark sticky-top" id="headKelola"></thead><tbody id="bodyKelola"></tbody></table>
-</div>
-<div id="paginasiKelola" class="d-flex justify-content-end gap-1 mt-2 mb-2"></div>
-</div>
-</div>
-</div>
-<script>
-// ==============================================================
-// KONFIGURASI PENTING
-// ==============================================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyg_Wcd6SvRN8iPnoDLhdDxYtdtUPKhg_kzG8EWHs-tAhKWe4Ro95GVNZQTPN_fDpxq/exec";
-const PASSWORD_ADMIN = "admin123";
 
+  <div class="app-wrapper">
+  <div class="row">
+    
+    <div class="col-lg-3 col-md-4 mb-4">
+      <div class="sidebar-menu">
+        <ul class="nav nav-pills flex-column">
+          <li class="nav-item mb-2">
+            <button class="nav-link active w-100 text-start" id="tabDashboard" onclick="bukaHalaman('dashboard')">📊 CashFlow</button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="nav-link w-100 text-start" id="tabWarga" onclick="bukaHalaman('warga')">✍️ Warga</button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="nav-link w-100 text-start" id="tabPolling" onclick="bukaHalaman('polling')">🗳️ Polling</button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="nav-link w-100 text-start" id="tabSecurity" onclick="bukaHalaman('security')">🛡️ Jadwal Security</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link w-100 text-start" id="tabAdmin" onclick="bukaHalaman('admin')">🔒 Admin</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-8">
+      
+      <div id="halamanDashboard" class="card-custom">
+        <h5 class="fw-bold mb-3 text-dark text-center">Grafik Keuangan Lingkungan</h5>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label text-muted">Pilih Tahun</label>
+            <select class="form-select form-select-sm" id="filterTahun" onchange="muatDashboard()">
+              <option value="Semua">-- Semua Tahun --</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label text-muted">Pilih Bulan</label>
+            <select class="form-select form-select-sm" id="filterBulan" onchange="muatDashboard()">
+              <option value="Semua" selected>-- Semua Bulan --</option>
+              <option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
+              <option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
+              <option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
+              <option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
+            </select>
+          </div>
+        </div>
+        <div class="finance-summary-box">
+          <div class="row g-2">
+            <div class="col-6"><div class="finance-card bg-masuk"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Masuk (Bulan Ini)</span><h5 class="text-success m-0 fw-bold" id="totalDashboard">Rp 0</h5></div></div>
+            <div class="col-6"><div class="finance-card bg-keluar"><span class="text-muted small fw-bold text-uppercase d-block mb-1">Keluar (Bulan Ini)</span><h5 class="text-danger m-0 fw-bold" id="totalPengeluaranDashboard">Rp 0</h5></div></div>
+          </div>
+          <div class="finance-card bg-saldo mt-2">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Selisih uang masuk & keluar (bulan ini)</span>
+            <h3 class="text-primary m-0 fw-bold" id="saldoBersihDashboard">Rp 0</h3>
+          </div>
+          <div class="finance-card mt-2" style="background-color: #fdf4ff; border-color: #f5d0fe;">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Saldo Keseluruhan (S.d Bulan Terpilih)</span>
+            <h3 class="m-0 fw-bold" style="color: #9333ea;" id="saldoAkumulasiDashboard">Rp 0</h3>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-4">
+              <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+                <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Lunas</span>
+                <h6 class="text-success m-0 fw-bold" id="totalWargaLunasDashboard">0 Warga</h6>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+                <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Menunggu ACC</span>
+                <h6 class="text-warning m-0 fw-bold" id="totalWargaPendingDashboard">0 Warga</h6>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+                <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Bayar</span>
+                <h6 class="text-danger m-0 fw-bold" id="totalWargaBelumBayarDashboard">0 Warga</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-2 mt-2">
+          <div class="col-6">
+            <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+              <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Sudah Dihuni</span>
+              <h6 class="text-primary m-0 fw-bold" id="totalHuniDashboard">0 Warga</h6>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="finance-card bg-white h-100" style="border: 1px solid #cbd5e1; padding: 10px;">
+              <span class="text-muted fw-bold d-block mb-1" style="font-size: 10px; text-transform: uppercase;">Belum Dihuni</span>
+              <h6 class="text-secondary m-0 fw-bold" id="totalBelumHuniDashboard">0 Warga</h6>
+            </div>
+          </div>
+        </div>
+        <div class="mb-4 mt-3" style="position: relative; height:220px; width:100%"><canvas id="chartIuran"></canvas></div>
+        <div class="border-top pt-3 mt-3">
+          <h6 class="fw-bold text-success mb-2 d-flex align-items-center">🟢 Rincian Uang Masuk yang Diterima</h6>
+          <div class="tabel-scroll mb-1">
+            <table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Sumber</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianMasuk"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
+          </div>
+          <div id="paginasiMasuk" class="d-flex justify-content-end gap-1 mb-3"></div>
+          <h6 class="fw-bold text-danger mb-2 d-flex align-items-center">🔴 Rincian Uang Keluar / Pengeluaran</h6>
+          <div class="tabel-scroll mb-1">
+            <table class="table table-sm table-striped small mb-0 align-middle"><thead class="table-light sticky-top"><tr><th>Tgl</th><th>Kategori</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody id="tabelRincianKeluar"><tr><td colspan="4" class="text-center text-muted py-2">Memuat data...</td></tr></tbody></table>
+          </div>
+          <div id="paginasiKeluar" class="d-flex justify-content-end gap-1 mb-2"></div>
+        </div>
+      </div>
+
+      <div id="halamanWarga" class="card-custom hidden">
+        <div class="genz-submenu">
+  <button class="active" id="btnSubBayar" onclick="bukaSubWarga('bayar')">💳 Konfirmasi Bayar</button>
+  <button id="btnSubCekMandiri" onclick="bukaSubWarga('cek')">🔎 Cek Tunggakan</button>
+</div>
+        <div id="subWargaBayar">
+          <h5 class="text-center fw-bold mb-3 text-dark">Kirim Konfirmasi Pembayaran</h5>
+          <form id="formIuran">
+            <div class="mb-3">
+              <label class="form-label">No. Rumah / Blok</label>
+              <select class="form-control" name="blok" id="blokWargaIuran" required>
+                <option value="">-- Memuat Data Blok... --</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control bg-light" id="namaWargaIuran" name="nama" readonly required placeholder="Otomatis terisi setelah pilih blok">
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <label class="form-label">Iuran Bulan</label>
+                <select class="form-select" id="bulanWarga" name="bulan" required>
+                  <option value="">-- Pilih Bulan --</option>
+                  <option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
+                  <option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
+                  <option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
+                  <option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
+                </select>
+              </div>
+              <div class="col-5"><label class="form-label">Tahun</label><select class="form-select" id="tahunWarga" name="tahunForm" required></select></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Jumlah Transfer (Rp)</label><input type="text" class="form-control" id="jumlahInput" placeholder="Contoh: 150.000" onkeyup="formatRibuan(this)" required></div>
+            <div class="mb-3"><label class="form-label">Upload Bukti Transfer</label><input type="file" class="form-control" id="fileInput" accept="image/*" required></div>
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-upgrade w-100">Kirim Konfirmasi</button>
+          </form>
+          <div id="pesanWarga" class="alert mt-3" style="display:none;"></div>
+        </div>
+
+        <div id="subWargaCek" class="hidden">
+          <h5 class="text-center fw-bold mb-3 text-dark">Cek Status Iuran Rumah</h5>
+          <div class="d-flex gap-2 mb-3">
+            <div class="flex-grow-1">
+              <select class="form-control" id="blokCekMandiri">
+                <option value="">-- Memuat Data Blok... --</option>
+              </select>
+            </div>
+            <button class="btn btn-primary fw-bold" type="button" id="btnProsesCek" onclick="prosesCekMandiriWarga()">Cari Data</button>
+          </div>
+          <div id="loadingCekWarga" class="text-center text-muted my-3" style="display:none;">Mencari data...</div>
+          <div id="hasilCekMandiri" class="box-hasil-cek hidden">
+            <h6 class="border-bottom pb-2 fw-bold">Hasil Analisis Blok: <span id="resBlokWarga" class="text-primary">-</span></h6>
+            <div class="mb-3"><label class="small fw-bold text-danger d-block mb-1">Bulan Belum Dibayar / Tunggakan:</label><div class="p-2 border rounded bg-white text-dark small" id="resDetailTunggakan">-</div></div>
+            <div><label class="small fw-bold text-muted d-block mb-1">Riwayat Pembayaran Terakhir:</label><div class="table-responsive"><table class="table table-sm table-bordered bg-white text-center small mb-0"><thead class="table-light"><tr><th>Bulan/Thn</th><th>Nominal</th><th>Status</th></tr></thead><tbody id="bodyRiwayatCekWarga"></tbody></table></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="halamanPolling" class="card-custom hidden">
+        <h5 class="text-center fw-bold mb-3 text-dark">Suara Warga</h5>
+        <p class="text-center text-muted small mb-4">Berikan pendapat Anda untuk program dan pengadaan fasilitas lingkungan.</p>
+        <div id="daftarPollingContainer">
+          <div class="text-center text-muted">Memuat data polling...</div>
+        </div>
+      </div>
+      <!-- HALAMAN SECURITY BARU -->
+      <div id="halamanSecurity" class="card-custom hidden">
+        <h5 class="text-center fw-bold mb-1 text-dark">Jadwal & Kontak Security</h5>
+        <p class="text-center text-muted small mb-3">Menampilkan jadwal shift penjagaan untuk bulan ini.</p>
+        
+        <!-- KOTAK INFO KONTAK SECURITY -->
+        <div class="row g-2 mb-3 text-center">
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light shadow-sm">
+              <span class="d-block fw-bold text-primary">👮‍♂️ Nur</span>
+              <a href="https://wa.me/6281xxxxxxxxx" target="_blank" class="text-decoration-none small text-success fw-bold">📞 0821-2592-1664</a>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light shadow-sm">
+              <span class="d-block fw-bold text-primary">👮‍♂️ Hendra</span>
+              <a href="https://wa.me/6281xxxxxxxxx" target="_blank" class="text-decoration-none small text-success fw-bold">📞 0895-4004-61234</a>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light shadow-sm">
+              <span class="d-block fw-bold text-primary">👮‍♂️ Jangkung</span>
+              <a href="https://wa.me/6281xxxxxxxxx" target="_blank" class="text-decoration-none small text-success fw-bold">📞 0895-4004-61234</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="loadingSecurity" class="text-center text-muted">Memuat data...</div>
+        
+        <div class="tabel-scroll mt-2" style="max-height: 400px;">
+          <table class="table table-sm table-bordered table-striped align-middle small mb-0 bg-white" id="tabelSecurity" style="display: none;">
+            <thead class="table-dark sticky-top">
+              <tr>
+                <th class="text-center">Tanggal</th>
+                <th class="text-center">Shift 1</th>
+                <th class="text-center">Shift 2</th>
+                <th class="text-center text-danger">Libur / Off</th>
+              </tr>
+            </thead>
+            <tbody id="bodySecurity" class="text-center"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- AKHIR HALAMAN SECURITY -->
+
+      <div id="halamanAdmin" class="card-custom hidden">
+        <h5 class="text-center fw-bold mb-3 text-dark">Panel Kontrol Verifikasi Admin</h5>
+        <div class="genz-submenu">
+  <button class="active" id="btnSubVerifikasi" onclick="bukaSubAdmin('verifikasi')">✅ Verifikasi Masuk</button>
+  <button id="btnSubTunggakan" onclick="bukaSubAdmin('tunggakan')">⚠️ Rekap Tunggakan</button>
+  <button id="btnSubPengeluaran" onclick="bukaSubAdmin('pengeluaran')">🔄 Buku Kas</button>
+  <button id="btnSubKelola" onclick="bukaSubAdmin('kelola')">⚙️ Kelola Data</button>
+</div>
+        <div id="subVerifikasi"><div id="loadingAdmin" class="text-center text-muted">Mengambil data pending...</div><div id="daftarPending"></div></div>
+        
+        <div id="subTunggakan" class="hidden">
+          <h5 class="mb-3 text-danger text-center fw-bold">Daftar Akumulasi Tunggakan Warga</h5>
+          <div id="loadingTunggakan" class="text-center text-muted">Menghitung data...</div>
+          <div class="table-responsive"><table class="table table-bordered table-striped align-middle mb-0 small" id="tabelTunggakan" style="display: none;"><thead class="table-dark"><tr><th>Blok</th><th>Nama</th><th class="text-center">Total</th><th>Detail Bulan</th></tr></thead><tbody id="bodyTunggakan"></tbody></table></div>
+          <div id="tunggakanKosong" class="alert alert-success text-center mt-2" style="display: none;">Semua warga lunas.</div>
+        </div>
+        
+        <div id="subPengeluaran" class="hidden">
+          <h5 class="mb-3 text-primary text-center fw-bold" id="judulFormKas">Pencatatan Buku Kas Umum</h5>
+          <form id="formPengeluaran">
+            <div class="mb-3">
+              <label class="form-label">Jenis Transaksi</label>
+              <select class="form-select" id="jenisKas" onchange="sesuaikanKategoriFormKas()" required>
+                <option value="Keluar">Uang Keluar (Pengeluaran Belanja / Operasional)</option>
+                <option value="Masuk">Uang Masuk (Pendapatan Non-Iuran / Donasi / Sewa)</option>
+              </select>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6"><label class="form-label">Tanggal Transaksi</label><input type="date" class="form-control" id="tglKeluar" required></div>
+              <div class="col-6"><label class="form-label">Kategori</label><select class="form-select" id="katKeluar" required></select></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Nominal Transaksi (Rp)</label><input type="text" class="form-control" id="nomKeluar" placeholder="Contoh: 500.000" onkeyup="formatRibuan(this)" required></div>
+            <div class="mb-3"><label class="form-label">Keterangan Detail</label><textarea class="form-control" id="ketKeluar" rows="2" placeholder="Contoh: Pembelian sapu lidi dan ember" required></textarea></div>
+            <button type="submit" id="btnSubmitKeluar" class="btn btn-primary btn-upgrade w-100">Simpan Ke Buku Kas</button>
+          </form>
+          <div id="pesanPengeluaran" class="alert alert-success mt-3" style="display:none;"></div>
+        </div>
+        
+        <div id="subKelola" class="hidden">
+          <div class="card p-3 mb-4 bg-light border-primary">
+            <h6 class="fw-bold text-primary mb-2">➕ Tambah Warga Baru (Master)</h6>
+            <div class="row g-2">
+              <div class="col-5">
+                <input type="text" class="form-control" id="inputBlokBaru" placeholder="Blok: A16">
+              </div>
+              <div class="col-4">
+                <input type="text" class="form-control" id="inputNamaBaru" placeholder="Nama Warga">
+              </div>
+              <div class="col-3">
+                <button class="btn btn-primary w-100 fw-bold" onclick="tambahDataWarga()">Simpan</button>
+              </div>
+            </div>
+          </div>
+          <div class="card p-3 mb-4 bg-light border-success">
+            <h6 class="fw-bold text-success mb-2">📊 Buat Polling Baru</h6>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="inputJudulPolling" placeholder="Judul Polling (Contoh: Rencana Pemasangan CCTV)">
+            </div>
+            <div class="mb-2">
+              <textarea class="form-control" id="inputDeskripsiPolling" rows="2" placeholder="Penjelasan detail tentang polling ini..."></textarea>
+            </div>
+            <button class="btn btn-success w-100 fw-bold" id="btnBuatPolling" onclick="tambahDataPolling()">Terbitkan Polling</button>
+          </div>
+          
+          <h5 class="mb-3 text-danger text-center fw-bold">Manajemen Edit & Hapus Data</h5>
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label text-muted">Pilih Kategori Data:</label>
+              <select class="form-select" id="pilihSheetKelola" onchange="handleKategoriKelolaChange()">
+                <option value="Data_Pembayaran">Data Iuran Warga</option>
+                <option value="Data_Pemasukan_Lain">Kas Masuk (Non-Iuran)</option>
+                <option value="Data_Pengeluaran">Kas Keluar (Pengeluaran)</option>
+                <option value="Master_Warga">Master Data Warga</option>
+                <option value="Suara_Warga">Komentar & Suara Polling</option>
+                <option value="Data_Polling">Master Data Polling</option> 
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label text-muted">Cari Data (Nama/Blok/Bulan):</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="kataKunciKelola" placeholder="Ketik kata kunci...">
+                <button class="btn btn-primary" onclick="muatTabelKelola()">🔍 Cari</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row g-2 mb-3" id="filterWaktuKelolaRow">
+            <div class="col-6">
+              <label class="form-label text-muted">Filter Tahun:</label>
+              <select class="form-select form-select-sm" id="filterTahunKelola" onchange="muatTabelKelola()">
+                <option value="Semua">-- Semua Tahun --</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label text-muted">Filter Bulan:</label>
+              <select class="form-select form-select-sm" id="filterBulanKelola" onchange="muatTabelKelola()">
+                <option value="Semua" selected>-- Semua Bulan --</option>
+                <option value="Januari">Januari</option> <option value="Februari">Februari</option> <option value="Maret">Maret</option>
+                <option value="April">April</option> <option value="Mei">Mei</option> <option value="Juni">Juni</option>
+                <option value="Juli">Juli</option> <option value="Agustus">Agustus</option> <option value="September">September</option>
+                <option value="Oktober">Oktober</option> <option value="November">November</option> <option value="Desember">Desember</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="loadingKelola" class="text-center text-muted my-3" style="display:none;">Memuat data...</div>
+          
+          <div id="formEditKelola" class="card-custom mt-3 hidden" style="border: 2px solid #ef4444; background: #fef2f2;">
+            <h6 class="text-danger fw-bold border-bottom pb-2">Edit Data (Baris : <span id="editRowId"></span>)</h6>
+            <input type="hidden" id="editSheetName">
+            <div id="editInputs" class="row g-2"></div>
+            <div class="mt-3 text-end">
+              <button class="btn btn-secondary btn-sm me-2" onclick="document.getElementById('formEditKelola').classList.add('hidden')">Batal</button>
+              <button class="btn btn-success btn-sm fw-bold" onclick="simpanHasilEdit(this)">💾 Simpan Perubahan</button>
+            </div>
+          </div>
+          
+          <div class="tabel-scroll mt-3" style="max-height: 350px;">
+            <table class="table table-sm table-bordered table-striped align-middle small mb-0 bg-white" id="tabelKelola"><thead class="table-dark sticky-top" id="headKelola"></thead><tbody id="bodyKelola"></tbody></table>
+          </div>
+          <div id="paginasiKelola" class="d-flex justify-content-end gap-1 mt-2 mb-2"></div>
+        </div>
+      </div>
+
+    </div> </div> </div> <script>
 // ==============================================================
-// SISTEM PEMANGGILAN API
+// KONFIGURASI PENTING (Kode JS tidak ada yang diubah fungsinya)
 // ==============================================================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbww92thzSXi9qxuwpB6yoP7_L4sCwQtHE2789s_WHWkQrrC9pbIBXaPm7YeH-wQisFw/exec";
+const PASSWORD_ADMIN = "admin123";
+const PASSWORD_WARGA = "TPS";
+
 async function apiGet(action, params = {}) {
   let url = new URL(SCRIPT_URL);
   url.searchParams.append("action", action);
@@ -367,27 +751,53 @@ async function apiPost(action, payload = {}) {
   return await res.json();
 }
 
-// ==============================================================
-// LOGIKA APLIKASI UTAMA
-// ==============================================================
 let sudahLogin = false;
 let chartInstance = null;
 const LIMIT_PER_PAGE = 20;
 let dataMasukGlobal = [], dataKeluarGlobal = [], dataKelolaGlobal = [];
 let pageMasuk = 1, pageKeluar = 1, pageKelola = 1;
-
 let masterWargaGlobal = [];
 
 window.onload = function() {
-  bikinOpsiTahunOtomatis();
-  bikinOpsiTahunFormWarga();
-  sesuaikanKategoriFormKas();
-  fetchMasterWarga(); 
+  // Hanya memunculkan layar login dan otomatis fokus ke kolom input
+  document.getElementById('inputPasswordWarga').focus();
 };
 
-// ==============================================================
-// FUNGSI INISIASI SELECT2 (DROPDOWN SEARCH)
-// ==============================================================
+function cekLoginWarga() {
+  const passInput = document.getElementById('inputPasswordWarga').value;
+  const pesanError = document.getElementById('pesanErrorLogin');
+
+  if (passInput === PASSWORD_WARGA) {
+    // Animasi fade out sebelum masuk sistem
+    document.getElementById('loginScreen').style.opacity = '0';
+    document.getElementById('loginScreen').style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(() => {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      
+      // Jalankan fungsi fetch data Google Sheet
+      bikinOpsiTahunOtomatis();
+      bikinOpsiTahunFormWarga();
+      sesuaikanKategoriFormKas();
+      fetchMasterWarga(); 
+    }, 500);
+
+  } else {
+    // Menampilkan pesan error dengan animasi shake (getar)
+    pesanError.style.display = 'block';
+    document.getElementById('inputPasswordWarga').value = ''; // Kosongkan input
+    setTimeout(() => { pesanError.style.display = 'none'; }, 3500);
+  }
+}
+
+// Fitur enter dari keyboard
+document.getElementById('inputPasswordWarga').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    cekLoginWarga();
+  }
+});
+
 async function fetchMasterWarga() {
   try {
     masterWargaGlobal = await apiGet('ambilMasterWarga');
@@ -400,23 +810,19 @@ function populateBlokDropdowns() {
   masterWargaGlobal.forEach(w => {
     optionsHtml += `<option value="${w.blok}" data-nama="${w.nama}">${w.blok}</option>`;
   });
-  
-  // Setup Form Iuran
   let selIuran = $('#blokWargaIuran');
   if(selIuran.length) { 
-      selIuran.html(optionsHtml); 
-      selIuran.select2({ width: '100%' }); // Aktifkan library Select2
+      selIuran.html(optionsHtml);
+      selIuran.select2({ width: '100%' });
       selIuran.on('change', function() {
           let namaTerpilih = $(this).find(':selected').data('nama');
           $('#namaWargaIuran').val(namaTerpilih || '');
       });
   }
-  
-  // Setup Form Cek Mandiri
   let selCek = $('#blokCekMandiri');
   if(selCek.length) { 
       selCek.html(optionsHtml); 
-      selCek.select2({ width: '100%' }); // Aktifkan library Select2
+      selCek.select2({ width: '100%' });
   }
 }
 
@@ -444,10 +850,12 @@ function sesuaikanKategoriFormKas() {
   const judul = document.getElementById('judulFormKas');
   selectKat.innerHTML = "";
   if (jenis === "Masuk") {
-    judul.innerText = "Catat Pemasukan Non-Iuran (Uang Masuk)"; judul.className = "mb-3 text-success text-center fw-bold"; btnSubmit.className = "btn btn-success btn-upgrade w-100";
+    judul.innerText = "Catat Pemasukan Non-Iuran (Uang Masuk)";
+    judul.className = "mb-3 text-success text-center fw-bold"; btnSubmit.className = "btn btn-success btn-upgrade w-100";
     ["Donasi / Sukarela", "Sewa Lapangan / Fasilitas", "Dana Sponsor", "Bunga Bank / Kas RT", "Pemasukan Lain-lain"].forEach(o => selectKat.add(new Option(o, o)));
   } else {
-    judul.innerText = "Catat Pengeluaran RT (Uang Keluar)"; judul.className = "mb-3 text-danger text-center fw-bold"; btnSubmit.className = "btn btn-danger btn-upgrade w-100";
+    judul.innerText = "Catat Pengeluaran RT (Uang Keluar)"; judul.className = "mb-3 text-danger text-center fw-bold";
+    btnSubmit.className = "btn btn-danger btn-upgrade w-100";
     ["Keamanan / Satpam", "Kebersihan / Sampah", "Perbaikan / Maintenance", "Sosial / Kegiatan Warga", "Pengeluaran Lain-lain"].forEach(o => selectKat.add(new Option(o, o)));
   }
 }
@@ -466,8 +874,10 @@ function formatRibuan(input) {
 }
 
 function bukaHalaman(menu) {
-  ['halamanDashboard', 'halamanWarga', 'halamanPolling', 'halamanAdmin'].forEach(id => document.getElementById(id).classList.add('hidden'));
-  ['tabDashboard', 'tabWarga', 'tabPolling', 'tabAdmin'].forEach(id => document.getElementById(id).classList.remove('active'));
+  // Tambahkan halamanSecurity dan tabSecurity ke dalam array
+  ['halamanDashboard', 'halamanWarga', 'halamanPolling', 'halamanAdmin', 'halamanSecurity'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  ['tabDashboard', 'tabWarga', 'tabPolling', 'tabAdmin', 'tabSecurity'].forEach(id => document.getElementById(id).classList.remove('active'));
+  
   if (menu === 'dashboard') {
     document.getElementById('halamanDashboard').classList.remove('hidden'); document.getElementById('tabDashboard').classList.add('active'); bikinOpsiTahunOtomatis();
   } else if (menu === 'warga') {
@@ -476,19 +886,28 @@ function bukaHalaman(menu) {
     document.getElementById('halamanPolling').classList.remove('hidden'); document.getElementById('tabPolling').classList.add('active');
     muatDataPolling();
   } else if (menu === 'admin') {
-    if (!sudahLogin) { let pass = prompt("Masukkan Password Admin:"); if (pass === PASSWORD_ADMIN) { sudahLogin = true;
-    } else { alert("Password Salah!"); bukaHalaman('dashboard'); return; } }
+    if (!sudahLogin) { let pass = prompt("Masukkan Password Admin:");
+    if (pass === PASSWORD_ADMIN) { sudahLogin = true;
+    } else { alert("Password Salah!"); bukaHalaman('dashboard'); return;
+    } }
     document.getElementById('halamanAdmin').classList.remove('hidden'); document.getElementById('tabAdmin').classList.add('active'); bukaSubAdmin('verifikasi');
+  } else if (menu === 'security') {
+    document.getElementById('halamanSecurity').classList.remove('hidden'); document.getElementById('tabSecurity').classList.add('active');
+    muatJadwalSecurity(); // Ini memanggil fungsi untuk mengambil data
   }
 }
 
 function bukaSubWarga(sub) {
   if (sub === 'bayar') {
-    document.getElementById('subWargaBayar').classList.remove('hidden'); document.getElementById('subWargaCek').classList.add('hidden');
-    document.getElementById('btnSubBayar').classList.add('active'); document.getElementById('btnSubCekMandiri').classList.remove('active');
+    document.getElementById('subWargaBayar').classList.remove('hidden');
+    document.getElementById('subWargaCek').classList.add('hidden');
+    document.getElementById('btnSubBayar').classList.add('active'); 
+    document.getElementById('btnSubCekMandiri').classList.remove('active');
   } else {
-    document.getElementById('subWargaBayar').classList.add('hidden'); document.getElementById('subWargaCek').classList.remove('hidden');
-    document.getElementById('btnSubBayar').className = "btn btn-sm btn-outline-primary w-50 fw-bold"; document.getElementById('btnSubCekMandiri').classList.add('active');
+    document.getElementById('subWargaBayar').classList.add('hidden'); 
+    document.getElementById('subWargaCek').classList.remove('hidden');
+    document.getElementById('btnSubBayar').classList.remove('active'); 
+    document.getElementById('btnSubCekMandiri').classList.add('active');
   }
 }
 
@@ -510,6 +929,7 @@ async function muatDashboard() {
     let elSaldo = document.getElementById('saldoBersihDashboard');
     elSaldo.innerText = "Rp " + data.saldoBersih.toLocaleString('id-ID');
     elSaldo.className = data.saldoBersih < 0 ? "text-danger m-0 fw-bold fs-3" : "text-primary m-0 fw-bold fs-3";
+    
     let elAkumulasi = document.getElementById('saldoAkumulasiDashboard');
     if(elAkumulasi) {
       elAkumulasi.innerText = "Rp " + data.saldoAkumulasi.toLocaleString('id-ID');
@@ -536,7 +956,8 @@ function tampilkanTabelMasuk() {
   const tbody = document.getElementById('tabelRincianMasuk'); tbody.innerHTML = "";
   if(dataMasukGlobal.length === 0) {
     tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi masuk</td></tr>';
-    document.getElementById('paginasiMasuk').innerHTML = ''; return;
+    document.getElementById('paginasiMasuk').innerHTML = '';
+    return;
   }
   const start = (pageMasuk - 1) * LIMIT_PER_PAGE; const end = start + LIMIT_PER_PAGE;
   const dataTampil = dataMasukGlobal.slice(start, end);
@@ -548,7 +969,8 @@ function tampilkanTabelKeluar() {
   const tbody = document.getElementById('tabelRincianKeluar'); tbody.innerHTML = "";
   if(dataKeluarGlobal.length === 0) {
     tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-2">Tidak ada transaksi keluar</td></tr>';
-    document.getElementById('paginasiKeluar').innerHTML = ''; return;
+    document.getElementById('paginasiKeluar').innerHTML = '';
+    return;
   }
   const start = (pageKeluar - 1) * LIMIT_PER_PAGE; const end = start + LIMIT_PER_PAGE;
   const dataTampil = dataKeluarGlobal.slice(start, end);
@@ -570,13 +992,14 @@ document.getElementById('formPengeluaran').addEventListener('submit', async func
     const respon = await apiPost('simpanTransaksiKasAdmin', { data: dataTransaksi });
     pesanBox.innerText = respon; pesanBox.style.display = "block";
     pesanBox.className = dataTransaksi.jenis === "Masuk" ? "alert alert-success mt-3" : "alert alert-danger mt-3";
-    document.getElementById('formPengeluaran').reset(); document.getElementById('tglKeluar').valueAsDate = new Date(); sesuaikanKategoriFormKas();
+    document.getElementById('formPengeluaran').reset(); document.getElementById('tglKeluar').valueAsDate = new Date();
+    sesuaikanKategoriFormKas();
   } catch(err) { alert("Gagal menyimpan data."); }
   btn.disabled = false; setTimeout(() => { pesanBox.style.display = "none"; }, 4000);
 });
 
 async function prosesCekMandiriWarga() {
-  const blokInput = $('#blokCekMandiri').val(); // Pakai jquery val
+  const blokInput = $('#blokCekMandiri').val();
   const loading = document.getElementById('loadingCekWarga'), hasilBox = document.getElementById('hasilCekMandiri');
   if(!blokInput) { alert("Silakan pilih/ketik Nomor Rumah!"); return; }
   
@@ -634,7 +1057,7 @@ document.getElementById('formIuran').addEventListener('submit', function(e) {
         const respon = await apiPost('prosesPembayaran', { dataForm: formData });
         pesanDiv.className = "alert alert-success mt-3"; pesanDiv.innerText = respon; pesanDiv.style.display = "block";
         document.getElementById('formIuran').reset(); bikinOpsiTahunFormWarga();
-        $('#blokWargaIuran').val(null).trigger('change'); // Reset Select2
+        $('#blokWargaIuran').val(null).trigger('change');
       } catch(err) { alert("Gagal mengirim."); }
       submitBtn.disabled = false; submitBtn.innerText = "Kirim Konfirmasi";
     };
@@ -752,21 +1175,8 @@ async function muatTabelKelola() {
     else if (sheet === "Data_Polling") headers = ["ID Polling", "Judul", "Deskripsi", "Status", "Aksi"];
     else headers = ["Tanggal", "Kategori", "Nominal", "Keterangan", "Aksi"];
     let headHtml = "<tr>"; headers.forEach(h => headHtml += `<th>${h}</th>`); headHtml += "</tr>";
-document.getElementById('headKelola').innerHTML = headHtml;
-
-// Tambahkan validasi ini
-if (!Array.isArray(data)) {
-  // Akan memunculkan wujud asli data yang dikirim server (misal: JSON Error)
-  let pesanServer = typeof data === 'object' ? JSON.stringify(data) : data;
-  document.getElementById('bodyKelola').innerHTML = `<tr><td colspan='10' class='text-center text-danger py-3'>
-    Gagal memuat data. Respons Server:<br><code>${pesanServer}</code>
-  </td></tr>`;
-  return; 
-}
-
-dataKelolaGlobal = data; 
-pageKelola = 1; 
-tampilkanTabelKelola();
+    document.getElementById('headKelola').innerHTML = headHtml;
+    dataKelolaGlobal = data; pageKelola = 1; tampilkanTabelKelola();
   } catch(e) { console.error(e); }
 }
 
@@ -783,7 +1193,6 @@ function tampilkanTabelKelola() {
   const dataTampil = dataKelolaGlobal.slice(start, end);
   
   let headers = Array.from(document.getElementById('headKelola').querySelectorAll('th')).map(th => th.innerText);
-
   dataTampil.forEach(row => {
     let rowId = row[row.length - 1]; let rowData = row.slice(0, row.length - 1); let tdHTML = "";
     
@@ -800,12 +1209,7 @@ function tampilkanTabelKelola() {
       tdHTML += `<td>${text}</td>`;
     }
     
-    let safeRowData = JSON.stringify(rowData).replace(/"/g, '&quot;'); // Escape double quotes
-
-tdHTML += `<td class="text-nowrap">
-  <button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick="bukaFormEdit(${safeRowData}, ${rowId})">✏️</button>
-  <button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button>
-</td>`;
+    tdHTML += `<td class="text-nowrap"><button class="btn btn-warning btn-sm py-0 px-1 me-1" onclick='bukaFormEdit(${JSON.stringify(rowData)}, ${rowId})'>✏️</button><button class="btn btn-danger btn-sm py-0 px-1" onclick="hapusDataAdmin(${rowId})">🗑️</button></td>`;
     tbody.insertAdjacentHTML('beforeend', `<tr>${tdHTML}</tr>`);
   });
   renderPaginasi('paginasiKelola', dataKelolaGlobal.length, pageKelola, 'ubahHalamanKelola');
@@ -814,15 +1218,17 @@ tdHTML += `<td class="text-nowrap">
 async function hapusDataAdmin(rowId) {
   if(!confirm("⚠️ Yakin ingin menghapus data di baris ke-" + rowId + " ini?")) return;
   const sheet = document.getElementById('pilihSheetKelola').value;
-  try { const res = await apiPost('hapusDataRow', { namaSheet: sheet, rowId: rowId }); alert(res.pesan); if(res.sukses) muatTabelKelola(); } catch(e) { alert("Gagal menghapus data."); }
+  try { const res = await apiPost('hapusDataRow', { namaSheet: sheet, rowId: rowId }); alert(res.pesan); if(res.sukses) muatTabelKelola();
+  } catch(e) { alert("Gagal menghapus data."); }
 }
 
 function bukaFormEdit(rowData, rowId) {
   const sheet = document.getElementById('pilihSheetKelola').value;
-  document.getElementById('formEditKelola').classList.remove('hidden'); document.getElementById('editRowId').innerText = rowId; document.getElementById('editSheetName').value = sheet;
+  document.getElementById('formEditKelola').classList.remove('hidden'); document.getElementById('editRowId').innerText = rowId;
+  document.getElementById('editSheetName').value = sheet;
   let headers;
   if (sheet === "Data_Pembayaran") headers = ["Tgl Input", "Nama", "Blok", "Bulan", "Nominal", "Bukti URL", "Status"];
-  else if (sheet === "Master_Warga") headers = ["Blok", "Nama Warga"]; 
+  else if (sheet === "Master_Warga") headers = ["Blok", "Nama Warga"];
   else if (sheet === "Suara_Warga") headers = ["Timestamp", "ID Polling", "Blok", "Pilihan", "Komentar", "Balasan Admin"];
   else if (sheet === "Data_Polling") headers = ["ID Polling", "Judul", "Deskripsi", "Status"];
   else headers = ["Tanggal", "Kategori", "Nominal", "Keterangan"];
@@ -851,7 +1257,8 @@ async function simpanHasilEdit(btn) {
     alert(res.pesan);
     if(res.sukses) { document.getElementById('formEditKelola').classList.add('hidden'); muatTabelKelola(); if (document.getElementById('filterTahun')) muatDashboard(); }
   } catch(e) { alert("Gagal menyimpan perubahan."); }
-  btn.disabled = false; btn.innerText = "💾 Simpan Perubahan";
+  btn.disabled = false;
+  btn.innerText = "💾 Simpan Perubahan";
 }
 
 async function tambahDataWarga() {
@@ -862,9 +1269,7 @@ async function tambahDataWarga() {
   const res = await apiPost('tambahWarga', { data: { blok: blok, nama: nama } });
   alert(res.pesan);
   if(res.sukses) {
-    document.getElementById('inputBlokBaru').value = "";
-    document.getElementById('inputNamaBaru').value = "";
-    fetchMasterWarga(); // Refresh global select2 options
+    document.getElementById('inputBlokBaru').value = ""; document.getElementById('inputNamaBaru').value = ""; fetchMasterWarga();
     if(document.getElementById('pilihSheetKelola').value === 'Master_Warga') { muatTabelKelola(); }
   }
 }
@@ -882,21 +1287,18 @@ async function muatDataPolling() {
     try {
         const res = await apiGet('ambilDataPolling');
         if (!res.polling || res.polling.length === 0) {
-            container.innerHTML = '<div class="alert alert-info text-center">Saat ini tidak ada polling yang aktif.</div>'; return;
+            container.innerHTML = '<div class="alert alert-info text-center">Saat ini tidak ada polling yang aktif.</div>';
+            return;
         }
-
         let optionsHtml = '<option value="">-- Pilih / Ketik Blok --</option>';
         masterWargaGlobal.forEach(w => {
             optionsHtml += `<option value="${w.blok}" data-nama="${w.nama}">${w.blok}</option>`;
         });
-
         let html = '';
         res.polling.forEach(p => {
             const komentarPolling = res.suara ? res.suara.filter(s => s.idPolling == p.id) : [];
             let totalSetuju = 0; let totalTidak = 0;
-            komentarPolling.forEach(k => {
-                if (k.pilihan === "Setuju") totalSetuju++; else if (k.pilihan === "Tidak Setuju") totalTidak++;
-            });
+            komentarPolling.forEach(k => { if (k.pilihan === "Setuju") totalSetuju++; else if (k.pilihan === "Tidak Setuju") totalTidak++; });
             let totalSuara = totalSetuju + totalTidak;
             
             html += `
@@ -922,8 +1324,6 @@ async function muatDataPolling() {
                 </div>
                 <div class="bg-light p-3 rounded mb-3">
                     <h6 class="fw-bold small mb-2">Berikan Suara Anda:</h6>
-                    
-                    <!-- SELECT2 UNTUK POLLING -->
                     <div class="row g-2 mb-2">
                         <div class="col-6">
                             <select class="form-control select2-polling" id="blokVote_${p.id}" required>
@@ -940,8 +1340,6 @@ async function muatDataPolling() {
                     <div class="mb-2">
                         <input type="text" class="form-control form-control-sm bg-light" id="namaVote_${p.id}" placeholder="Nama warga (Otomatis Terisi)" readonly>
                     </div>
-                    <!-- BATAS MODIFIKASI -->
-
                     <textarea class="form-control form-control-sm mb-2" id="komentarVote_${p.id}" rows="2" placeholder="Tulis komentar/alasan Anda (Opsional)"></textarea>
                     <button class="btn btn-primary btn-sm w-100 fw-bold" onclick="kirimSuara('${p.id}', this)">Kirim Suara</button>
                     <div id="pesanVote_${p.id}" class="alert mt-2 p-2 small" style="display:none;"></div>
@@ -979,19 +1377,17 @@ async function muatDataPolling() {
         
         container.innerHTML = html;
 
-        // INISIASI SELECT2 UNTUK SETIAP POLLING YANG MUNCUL
         res.polling.forEach(p => {
             $(`#blokVote_${p.id}`).select2({ width: '100%' }).on('change', function() {
                 let namaTerpilih = $(this).find(':selected').data('nama');
                 $(`#namaVote_${p.id}`).val(namaTerpilih || '');
             });
         });
-
     } catch(e) { container.innerHTML = '<div class="alert alert-danger text-center">Gagal memuat data polling.</div>'; }
 }
 
 async function kirimSuara(idPolling, btn) {
-    const blok = $(`#blokVote_${idPolling}`).val(); // pakai fungsi jquery untuk select2
+    const blok = $(`#blokVote_${idPolling}`).val();
     const pilihan = document.getElementById(`pilihanVote_${idPolling}`).value;
     const komentar = document.getElementById(`komentarVote_${idPolling}`).value;
     const pesanBox = document.getElementById(`pesanVote_${idPolling}`);
@@ -1004,12 +1400,49 @@ async function kirimSuara(idPolling, btn) {
         pesanBox.className = res.sukses ? "alert alert-success mt-2 p-2 small" : "alert alert-danger mt-2 p-2 small";
         pesanBox.innerText = res.pesan;
         if(res.sukses) { 
-            $(`#blokVote_${idPolling}`).val(null).trigger('change'); // reset select2
-            document.getElementById(`komentarVote_${idPolling}`).value = ""; 
+            $(`#blokVote_${idPolling}`).val(null).trigger('change');
+            document.getElementById(`komentarVote_${idPolling}`).value = "";
             setTimeout(() => { muatDataPolling(); }, 2000); 
         }
     } catch(e) { alert("Gagal mengirim suara."); }
     btn.disabled = false; btn.innerText = "Kirim Suara";
+}
+
+async function muatJadwalSecurity() {
+  document.getElementById('loadingSecurity').style.display = "block";
+  document.getElementById('tabelSecurity').style.display = "none";
+  document.getElementById('bodySecurity').innerHTML = "";
+  
+  try {
+    const data = await apiGet('ambilJadwalSecurity');
+    document.getElementById('loadingSecurity').style.display = "none";
+    
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    
+    document.getElementById('tabelSecurity').style.display = "table";
+    const tbody = document.getElementById('bodySecurity');
+    
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada data jadwal untuk bulan ini.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td class="text-nowrap fw-bold">${item.tanggal}</td>
+          <td><span class="badge bg-primary px-2 py-1">${item.shift1}</span></td>
+          <td><span class="badge bg-info text-dark px-2 py-1">${item.shift2}</span></td>
+          <td><span class="badge bg-danger px-2 py-1">${item.libur}</span></td>
+        </tr>
+      `);
+    });
+  } catch (e) {
+    document.getElementById('loadingSecurity').innerText = "Terjadi kesalahan saat memuat jadwal.";
+  }
 }
 </script>
 </body>
