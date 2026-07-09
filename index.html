@@ -863,8 +863,15 @@ function sesuaikanKategoriFormKas() {
 function bikinOpsiTahunFormWarga() {
   const sel = document.getElementById('tahunWarga'); sel.innerHTML = "";
   const thnSkg = new Date().getFullYear();
-  for (let i = -1; i <= 0; i++) { let opt = new Option(thnSkg + i, thnSkg + i);
-  if (i === 0) opt.selected = true; sel.appendChild(opt); }
+  
+  // Ubah batas 'i <= 0' menjadi 'i <= 1' agar tahun depan ikut muncul
+  for (let i = -1; i <= 1; i++) { 
+    let opt = new Option(thnSkg + i, thnSkg + i);
+    
+    // Tahun saat ini tetap menjadi pilihan default (otomatis terpilih)
+    if (i === 0) opt.selected = true; 
+    sel.appendChild(opt); 
+  }
 }
 
 function formatRibuan(input) {
